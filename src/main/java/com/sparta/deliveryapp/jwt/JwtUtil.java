@@ -40,7 +40,7 @@ public class JwtUtil {
     }
 
     //토큰 생성
-    public String createToken(Long userId, UserRole userRole) {
+    public String createToken(Integer userId, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +

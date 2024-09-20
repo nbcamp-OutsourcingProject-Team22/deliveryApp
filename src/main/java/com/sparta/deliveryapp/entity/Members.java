@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.entity;
 
+import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name="members")
-public class Members {
+public class Members extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
