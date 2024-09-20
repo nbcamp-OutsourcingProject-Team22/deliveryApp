@@ -1,5 +1,7 @@
 package com.sparta.deliveryapp.domain.member.controller;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
 import com.sparta.deliveryapp.domain.dto.request.SignupRequest;
 import com.sparta.deliveryapp.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +21,16 @@ public class MemberController {
 
     //owner 회원가입
     @PostMapping("/owner/sign-up")
-    public ResponseEntity<String> signup (@RequestBody SignupRequest request){
-        try {
-            memberService.signup(request);
-            return new ResponseEntity<>("화원가입 완료", HttpStatus.OK);
-        }catch(RuntimeException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<ApiResponse<Void>> signup (@RequestBody SignupRequest request){
+
+        ApiResponseEnumImpl result = memberService.signup(request);
+        return ApiResponse.of(result);
+    }
+
+    //user 회원가입
+    @PostMapping("/user/sign-up")
+    public ResponseEntity<ApiResponse<Void>> userSignup (@RequestBody SignupRequest request){
+        ApiResponseEnumImpl result =  memberService.userSignup(request);
+        return ApiResponse.of(result);
     }
 }

@@ -1,7 +1,9 @@
 package com.sparta.deliveryapp.exception;
 
-public class InvalidRequestException extends RuntimeException {
-    public InvalidRequestException(String message) {
-        super(message);
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
+
+public class InvalidRequestException extends BaseException {
+    public InvalidRequestException(ApiResponseEnumImpl apiResponseEnum) {
+        super(apiResponseEnum);
     }
 }
