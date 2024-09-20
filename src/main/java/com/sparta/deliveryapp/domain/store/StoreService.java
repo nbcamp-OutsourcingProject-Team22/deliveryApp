@@ -1,4 +1,4 @@
-package com.sparta.deliveryapp.domain.store.service;
+package com.sparta.deliveryapp.domain.store;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
@@ -26,7 +26,7 @@ public class StoreService {
             StoreRequestDto requestDto
     ) {
 //        Member member =  memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(...) );
-//        if (member.role == UserRole.USER) {
+//        if (member.role.equals(UserRole.USER) ) {
 //            throw new HandleUnauthorized(ApiResponseStoreEnum.NOT_OWNER)
 //        }
 //        int storeCount = getStoreCount(memberId);

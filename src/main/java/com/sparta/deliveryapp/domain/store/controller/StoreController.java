@@ -2,7 +2,7 @@ package com.sparta.deliveryapp.domain.store.controller;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
-import com.sparta.deliveryapp.domain.store.service.StoreService;
+import com.sparta.deliveryapp.domain.store.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
