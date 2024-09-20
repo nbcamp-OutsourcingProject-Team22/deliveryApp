@@ -1,0 +1,27 @@
+server:
+  port: ${PORT:8000}
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+
+    # Using MySQL
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
