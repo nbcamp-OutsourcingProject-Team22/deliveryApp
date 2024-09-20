@@ -1,11 +1,11 @@
 package com.sparta.deliveryapp.domain.Order;
 
+import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
-import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
@@ -24,7 +24,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
