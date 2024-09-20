@@ -15,8 +15,8 @@ public enum OrderStatusEnum {
     REJECTED(10,"REJECTED") ;       // 배달 거부
 
 
-    private final int order;
-    private final String process;
+    private int order;
+    private String process;
 
     OrderStatusEnum(int order, String process) {
         this.order = order;
