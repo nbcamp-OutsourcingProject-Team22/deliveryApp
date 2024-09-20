@@ -11,9 +11,11 @@ import com.sun.jdi.request.InvalidRequestStateException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.InvalidPropertiesFormatException;
 import java.util.Objects;
 
 @Service
@@ -54,16 +56,36 @@ public class OrderService {
         return order.getStatus().getProcess();
     }
 
-    public void acceptOrder(long orderId) {
+    public void acceptOrder(Member member,long orderId) {
         Order order =checkOrderStatus(orderId);
-
+        //주인 맞는지 체크 해야함
+//      checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
     }
 
-    public void rejectOrder(long orderId) {
+    public void rejectOrder(Member member,long orderId) {
         Order order =checkOrderStatus(orderId);
-
+        //주인 맞는지 체크 해야함
+//        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
+    }
+
+    public String proceedOrder(Member member, long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+
+//        checkOwnerOfStore(order, member);
+
+        if(order.getStatus()==OrderStatusEnum.DELIVERED){
+            throw new IllegalArgumentException("이미 완료된 주문입니다.");
+        }
+        if(order.getStatus()==OrderStatusEnum.REJECTED){
+            throw new IllegalArgumentException("이미 거부된 주문입니다.");
+        }
+
+        order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()]);
+
+        return order.getStatus().getProcess();
     }
 
     private Order checkOrderStatus(long orderId){
@@ -76,5 +98,23 @@ public class OrderService {
 
         return order;
     }
+
+
+//    private void checkOwnerOfStore(Order order, Member member) {
+//        Store store = order.getStore();
+//
+//        // Null 검사 추가
+//        if (store == null || store.getMember() == null || member == null) {
+//            throw new IllegalArgumentException("가게 또는 멤버 정보가 누락되었습니다.");
+//        }
+//
+//        if (!store.getMember().equals(member)) {
+//            throw new IllegalArgumentException("해당 가게의 주인이 아닙니다.");
+//        }
+//    }
+
+
+
+
 }
 
