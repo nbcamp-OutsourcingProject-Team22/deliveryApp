@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "`order`")
 public class Order extends Timestamped {
 
     @Id
