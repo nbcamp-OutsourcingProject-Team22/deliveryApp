@@ -8,10 +8,13 @@ import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.*;
 import com.sun.jdi.request.InvalidRequestStateException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +27,13 @@ public class OrderService {
 
 
     @Transactional
-    public OrderResponseDto requestOrder(OrderRequestDto orderRequestDto) {
-        // 일단 멤머를 실험용으로
-        Member member = new Member();
+    public OrderResponseDto requestOrder(Member member, OrderRequestDto orderRequestDto) {
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
-                .orElseThrow(() -> new InvalidRequestStateException("가게를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다."));
 
         Menu menu = menuRepository.findById(orderRequestDto.getMenuId())
-                .orElseThrow(() -> new InvalidRequestStateException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
 
 
         Order order = new Order(member,store,menu, OrderStatusEnum.REQUEST);
@@ -40,6 +41,17 @@ public class OrderService {
 
         return new OrderResponseDto(savedOrder.getId());
 
+    }
+
+    public String checkOrder(Member member, long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+
+        if(!Objects.equals(order.getMember().getId(), member.getId())) {
+            throw new IllegalArgumentException("해당 주문에 대한 권한이 없습니다.");
+        }
+
+        return order.getStatus().getProcess();
     }
 }
 
