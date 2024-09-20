@@ -1,14 +1,17 @@
 package com.sparta.deliveryapp.entity;
 
 
-import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
+import com.sparta.deliveryapp.domain.common.Timestamped;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
