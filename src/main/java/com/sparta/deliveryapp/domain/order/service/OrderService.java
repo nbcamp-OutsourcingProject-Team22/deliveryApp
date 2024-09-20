@@ -32,7 +32,7 @@ public class OrderService {
                 .orElseThrow(() -> new InvalidRequestStateException("가게를 찾을 수 없습니다."));
 
         Menu menu = menuRepository.findById(orderRequestDto.getMenuId())
-                .orElseThrow(() -> new InvalidRequestStateException("메뉴를 찾을 수 없습니다"));
+                .orElseThrow(() -> new InvalidRequestStateException("메뉴를 찾을 수 없습니다."));
 
 
         Order order = new Order(member,store,menu, OrderStatusEnum.REQUEST);

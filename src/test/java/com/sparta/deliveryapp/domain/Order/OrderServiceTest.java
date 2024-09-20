@@ -9,6 +9,7 @@ import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
+import com.sun.jdi.request.InvalidRequestStateException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -63,5 +66,37 @@ public class OrderServiceTest {
         assertThat(response.getOrderId()).isEqualTo(1L);
     }
 
+    @Test
+    void Order_가게없음(){
+        // given
+        OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
 
+        given(storeRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        InvalidRequestStateException exception = assertThrows(InvalidRequestStateException.class, () -> {
+            orderService.requestOrder(orderRequestDto);
+        });
+
+        assertEquals("가게를 찾을 수 없습니다.",exception.getMessage());
+    }
+
+    @Test
+    void Order_메뉴없음(){
+        // given
+        OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
+
+        Store store = new Store();
+        ReflectionTestUtils.setField(store, "id", 1L);
+
+        given(storeRepository.findById(1L)).willReturn(Optional.of(store));
+        given(menuRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        InvalidRequestStateException exception = assertThrows(InvalidRequestStateException.class, () -> {
+            orderService.requestOrder(orderRequestDto);
+        });
+
+        assertEquals("메뉴를 찾을 수 없습니다.",exception.getMessage());
+    }
 }
