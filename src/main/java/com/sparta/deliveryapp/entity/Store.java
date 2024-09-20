@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.entity;
 
+
 import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import jakarta.persistence.*;
@@ -57,4 +58,5 @@ public class Store extends Timestamped {
 //    public void addMember(Member member) {
 //        this.member = member;
 //    }
+
 }
