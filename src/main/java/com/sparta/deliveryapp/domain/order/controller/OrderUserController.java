@@ -5,14 +5,13 @@ import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/user/orders")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderUserController {
 
     private final OrderService orderService;
 
@@ -36,5 +35,6 @@ public class OrderController {
         String checkResponse = orderService.checkOrder(member,orderId);
         return ResponseEntity.ok(checkResponse);
     }
+
 
 }

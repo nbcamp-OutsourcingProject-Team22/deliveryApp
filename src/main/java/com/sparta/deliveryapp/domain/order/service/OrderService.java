@@ -53,5 +53,28 @@ public class OrderService {
 
         return order.getStatus().getProcess();
     }
+
+    public void acceptOrder(long orderId) {
+        Order order =checkOrderStatus(orderId);
+
+        order.changeStatus(OrderStatusEnum.ACCEPTED);
+    }
+
+    public void rejectOrder(long orderId) {
+        Order order =checkOrderStatus(orderId);
+
+        order.changeStatus(OrderStatusEnum.REJECTED);
+    }
+
+    private Order checkOrderStatus(long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+
+        if(!order.getStatus().equals(OrderStatusEnum.REQUEST)){
+            throw new IllegalArgumentException("이미 진행된 주문입니다.");
+        }
+
+        return order;
+    }
 }
 

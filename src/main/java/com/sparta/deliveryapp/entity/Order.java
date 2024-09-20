@@ -42,5 +42,8 @@ public class Order extends Timestamped {
         this.status = status;
     }
 
+    public void changeStatus(OrderStatusEnum status){
+        this.status = status;
+    }
 
 }
