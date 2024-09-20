@@ -21,23 +21,22 @@ public class MemberController {
 
     //owner 회원가입
     @PostMapping("/owner/sign-up")
-    public ResponseEntity<ApiResponse<Void>> signup (@RequestBody SignupRequestDto request){
-
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody SignupRequestDto request) {
         ApiResponse<Void> result = memberService.signup(request);
         return ApiResponse.of(result);
     }
 
     //user 회원가입
     @PostMapping("/user/sign-up")
-    public ResponseEntity<ApiResponse<Void>> userSignup (@RequestBody SignupRequestDto request){
-        ApiResponse<Void> result =  memberService.userSignup(request);
+    public ResponseEntity<ApiResponse<Void>> userSignup(@RequestBody SignupRequestDto request) {
+        ApiResponse<Void> result = memberService.userSignup(request);
         return ApiResponse.of(result);
     }
 
     //owner, user login
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@RequestBody SignInRequestDto requestDto){
-                String token = memberService.signIn(requestDto);
-                return ResponseEntity.ok(token);
+    public ResponseEntity<String> signIn(@RequestBody SignInRequestDto requestDto) {
+        String token = memberService.signIn(requestDto);
+        return ResponseEntity.ok(token);
     }
 }
