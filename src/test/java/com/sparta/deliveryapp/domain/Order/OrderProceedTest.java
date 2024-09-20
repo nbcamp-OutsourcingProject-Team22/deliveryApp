@@ -2,6 +2,7 @@ package com.sparta.deliveryapp.domain.Order;
 
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
+import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
@@ -62,9 +63,9 @@ public class OrderProceedTest {
 
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        String ret = orderService.proceedOrder(member, order.getId());
+        OrderOwnerResponseDto ret = orderService.proceedOrder(member, order.getId());
 
-        assertThat(ret).isEqualTo("IN DELIVERY");
+        assertThat(ret.getProcess()).isEqualTo("IN DELIVERY");
 
     }
     @Test

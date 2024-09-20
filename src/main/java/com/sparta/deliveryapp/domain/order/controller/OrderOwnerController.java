@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.domain.order.controller;
 
+import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -14,24 +15,21 @@ public class OrderOwnerController {
     private final OrderService orderService;
 
     @PutMapping("/{orderId}/accept")
-    public ResponseEntity<Void> acceptOrder(@PathVariable long orderId){
+    public ResponseEntity<OrderOwnerResponseDto> acceptOrder(@PathVariable long orderId){
         Member member = new Member();
-        orderService.acceptOrder(member,orderId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(orderService.acceptOrder(member, orderId));
     }
 
     @PutMapping("/{orderId}/reject")
-    public ResponseEntity<Void> rejectOrder(@PathVariable long orderId){
+    public ResponseEntity<OrderOwnerResponseDto> rejectOrder(@PathVariable long orderId){
         Member member = new Member();
-        orderService.rejectOrder(member,orderId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(orderService.rejectOrder(member, orderId));
     }
 
     @PutMapping("/{orderId}/next")
-    public ResponseEntity<String> proceedOrder(@PathVariable long orderId){
+    public ResponseEntity<OrderOwnerResponseDto> proceedOrder(@PathVariable long orderId){
         Member member = new Member();
-        String proceedResponse = orderService.proceedOrder(member, orderId);
-        return ResponseEntity.ok(proceedResponse);
+        return ResponseEntity.ok(orderService.proceedOrder(member, orderId));
     }
 
 }

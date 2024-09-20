@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.domain.order.controller;
 
+import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
@@ -15,7 +16,6 @@ public class OrderUserController {
 
     private final OrderService orderService;
 
-
     // 추후 사용자 정보 받아야함
     @PostMapping("/request")
     public ResponseEntity<OrderResponseDto> requestOrder(@RequestBody OrderRequestDto orderRequestDto){
@@ -28,12 +28,10 @@ public class OrderUserController {
 
     // 추후 사용자 정보 받아야함
     @GetMapping("/{orderId}")
-    public ResponseEntity<String> checkOrder(@PathVariable long orderId){
+    public ResponseEntity<OrderOwnerResponseDto> checkOrder(@PathVariable long orderId){
 
         Member member = new Member(); // 추후 바꿔야함
-
-        String checkResponse = orderService.checkOrder(member,orderId);
-        return ResponseEntity.ok(checkResponse);
+        return ResponseEntity.ok(orderService.checkOrder(member,orderId));
     }
 
 

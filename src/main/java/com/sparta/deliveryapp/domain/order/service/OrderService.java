@@ -2,6 +2,7 @@ package com.sparta.deliveryapp.domain.order.service;
 
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
+import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
@@ -45,7 +46,7 @@ public class OrderService {
 
     }
 
-    public String checkOrder(Member member, long orderId) {
+    public OrderOwnerResponseDto checkOrder(Member member, long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
 
@@ -53,24 +54,30 @@ public class OrderService {
             throw new IllegalArgumentException("해당 주문에 대한 권한이 없습니다.");
         }
 
-        return order.getStatus().getProcess();
+        OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
+        return orderOwnerResponseDto;
     }
 
-    public void acceptOrder(Member member,long orderId) {
+    public OrderOwnerResponseDto acceptOrder(Member member, long orderId) {
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
 //      checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
+
+        OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
+        return orderOwnerResponseDto;
     }
 
-    public void rejectOrder(Member member,long orderId) {
+    public OrderOwnerResponseDto rejectOrder(Member member,long orderId) {
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
 //        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
+        OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
+        return orderOwnerResponseDto;
     }
 
-    public String proceedOrder(Member member, long orderId) {
+    public OrderOwnerResponseDto proceedOrder(Member member, long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
 
@@ -84,8 +91,8 @@ public class OrderService {
         }
 
         order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()]);
-
-        return order.getStatus().getProcess();
+        OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
+        return orderOwnerResponseDto;
     }
 
     private Order checkOrderStatus(long orderId){
