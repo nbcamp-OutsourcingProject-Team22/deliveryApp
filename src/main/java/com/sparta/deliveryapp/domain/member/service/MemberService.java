@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.domain.member.service;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.config.PasswordEncoder;
@@ -25,7 +26,7 @@ public class MemberService {
     private final JwtUtil jwtUtil;
 
 
-    public ApiResponseMemberEnum signup(SignupRequestDto request) {
+    public ApiResponse<Void> signup(SignupRequestDto request) {
         Optional<Members> userByEmail = memberRepository.findByEmail(request.getEmail());
         Optional<Members> userByNickname = memberRepository.findByUsername(request.getUsername());
 
@@ -55,10 +56,10 @@ public class MemberService {
 
 
        memberRepository.save(newMember);
-       return ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS;
+       return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
     }
 
-    public ApiResponseMemberEnum userSignup(SignupRequestDto request) {
+    public ApiResponse<Void> userSignup(SignupRequestDto request) {
         Optional<Members> userByEmail = memberRepository.findByEmail(request.getEmail());
         Optional<Members> userByNickname = memberRepository.findByUsername(request.getUsername());
 
@@ -87,7 +88,7 @@ public class MemberService {
         );
 
         memberRepository.save(newMember);
-        return ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS;
+        return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
     }
 
     public String signIn(SignInRequestDto requestDto) {

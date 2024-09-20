@@ -23,14 +23,14 @@ public class MemberController {
     @PostMapping("/owner/sign-up")
     public ResponseEntity<ApiResponse<Void>> signup (@RequestBody SignupRequestDto request){
 
-        ApiResponseEnumImpl result = memberService.signup(request);
+        ApiResponse<Void> result = memberService.signup(request);
         return ApiResponse.of(result);
     }
 
     //user 회원가입
     @PostMapping("/user/sign-up")
     public ResponseEntity<ApiResponse<Void>> userSignup (@RequestBody SignupRequestDto request){
-        ApiResponseEnumImpl result =  memberService.userSignup(request);
+        ApiResponse<Void> result =  memberService.userSignup(request);
         return ApiResponse.of(result);
     }
 

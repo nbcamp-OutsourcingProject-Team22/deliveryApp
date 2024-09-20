@@ -37,6 +37,9 @@ out/
 .vscode/
 
 ### ENV ###
+
+dev.env
 .env
 
 ## resources ###
+
