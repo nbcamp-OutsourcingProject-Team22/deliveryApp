@@ -1,6 +1,6 @@
 package com.sparta.deliveryapp.domain.store.service;
 
-import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
@@ -9,6 +9,8 @@ import com.sparta.deliveryapp.exception.HandleNotFound;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -19,7 +21,7 @@ public class StoreService {
 
     // TODO: 멤버 연관관계 추가해야함
     @Transactional
-    public ApiResponseEnumImpl createStore(
+    public ApiResponse<Void> createStore(
             // memberId,
             StoreRequestDto requestDto
     ) {
@@ -33,7 +35,23 @@ public class StoreService {
 //        }
         Store store = Store.of(requestDto);
         storeRepository.save(store);
-        return ApiResponseStoreEnum.STORE_SAVE_SUCCESS;
+        return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_SAVE_SUCCESS);
+    }
+
+    // TODO: 수정할때 가게만든 사장이랑, 로그인한 사장이 일치하는지 확인해야함
+    @Transactional
+    public ApiResponse<Void> updateStore(Long storeId, StoreRequestDto storeRequestDto) {
+        Store store = findByStoreId(storeId);
+        Store updateStore = Store.builder()
+                .id(store.getId())
+                .storeName(Objects.isNull(storeRequestDto.getStoreName()) ? store.getStoreName() : storeRequestDto.getStoreName() )
+                .openingTime(Objects.isNull(storeRequestDto.getOpeningTime()) ? store.getOpeningTime() : storeRequestDto.getOpeningTime() )
+                .closingTime(Objects.isNull(storeRequestDto.getClosingTime()) ? store.getClosingTime() : storeRequestDto.getClosingTime() )
+                .minOrderAmount(Objects.isNull(storeRequestDto.getMinOrderAmount()) ? store.getMinOrderAmount() : storeRequestDto.getMinOrderAmount() )
+                .isClose(false)
+                .build();
+        storeRepository.save(updateStore);
+        return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_UPDATE_SUCCESS);
     }
 
 
@@ -48,6 +66,8 @@ public class StoreService {
     public Store findByStoreId(Long storeId) {
         return storeRepository.findById(storeId).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
     }
+
+
 
     /**
      * 사장 id로 가게 몇개 개설했는지 찾는 메서드
