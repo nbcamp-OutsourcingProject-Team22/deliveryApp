@@ -9,25 +9,26 @@ import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+
+
 @ExtendWith(MockitoExtension.class)
-public class OrderAcceptTest {
+public class OrderProceedTest {
 
     @Mock
     private StoreRepository storeRepository;
@@ -42,7 +43,6 @@ public class OrderAcceptTest {
     private Member member;
     private Store store;
     private Menu menu;
-    private Order order;
 
     @BeforeEach
     void setUp(){
@@ -52,51 +52,44 @@ public class OrderAcceptTest {
         ReflectionTestUtils.setField(store, "id", 1L);
         menu = mock(Menu.class);
         ReflectionTestUtils.setField(menu, "id", 1L);
-        order = new Order(member, store, menu, OrderStatusEnum.REQUEST);
+
+    }
+
+    @Test
+    void 주문_진행_성공(){
+        Order order = new Order(member, store, menu, OrderStatusEnum.PREPARING);
         ReflectionTestUtils.setField(order, "id", 1L);
-    }
 
-    @Test
-    void 요청_수락(){
-        // given
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        // when
-        orderService.acceptOrder(member,1L);
+        String ret = orderService.proceedOrder(member, order.getId());
 
-        // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.ACCEPTED);
+        assertThat(ret).isEqualTo("IN DELIVERY");
+
     }
     @Test
-    void 요청_거절(){
-        // given
+    void 이미_완료된_주문(){
+        Order order = new Order(member, store, menu, OrderStatusEnum.DELIVERED);
+        ReflectionTestUtils.setField(order, "id", 1L);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        // when
-        orderService.rejectOrder(member,1L);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()->{
+            orderService.proceedOrder(member, order.getId());
+        });
 
-        // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.REJECTED);
+        assertEquals("이미 완료된 주문입니다.",exception.getMessage());
+
     }
     @Test
-    void 이미_진행된_주문() {
-        // given
-        order.changeStatus(OrderStatusEnum.ACCEPTED);
+    void 이미_거부된_주문_진행(){
+        Order order = new Order(member, store, menu, OrderStatusEnum.REJECTED);
+        ReflectionTestUtils.setField(order, "id", 1L);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        // when & then
-        assertThatThrownBy(() -> orderService.acceptOrder(member,1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이미 진행된 주문입니다.");
-    }
-    @Test
-    void 주문_없음() {
-        // given
-        given(orderRepository.findById(1L)).willReturn(Optional.empty());
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()->{
+            orderService.proceedOrder(member, order.getId());
+        });
 
-        // when & then
-        assertThatThrownBy(() -> orderService.acceptOrder(member,1L))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("주문을 찾을 수 없습니다.");
+        assertEquals("이미 거부된 주문입니다.",exception.getMessage());
     }
 }
