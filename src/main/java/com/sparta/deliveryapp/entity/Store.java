@@ -4,15 +4,13 @@ package com.sparta.deliveryapp.entity;
 import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalTime;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 @Getter
 @Entity
 public class Store extends Timestamped {
