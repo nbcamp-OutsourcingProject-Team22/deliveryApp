@@ -1,9 +1,7 @@
 package com.sparta.deliveryapp.entity;
 
 import com.sparta.deliveryapp.domain.menu.dto.MenuRequest;
-import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +25,7 @@ public class Menu {
     @Column(nullable = false)
     private String menuDescription;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
 

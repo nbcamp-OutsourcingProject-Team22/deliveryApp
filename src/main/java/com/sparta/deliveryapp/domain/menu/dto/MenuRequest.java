@@ -3,7 +3,6 @@ package com.sparta.deliveryapp.domain.menu.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
-import java.time.LocalTime;
 
 @Getter
 public class MenuRequest {
