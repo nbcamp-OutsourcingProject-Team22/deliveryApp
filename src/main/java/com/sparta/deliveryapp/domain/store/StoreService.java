@@ -1,9 +1,13 @@
 package com.sparta.deliveryapp.domain.store;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMenuEnum;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
+import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
+import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
+import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleNotFound;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,7 @@ import java.util.Objects;
 @Service
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final MenuRepository menuRepository;
 //    private final MemberRepository memberRepository;
 //    private final MemberService memberService;
 
@@ -54,6 +59,14 @@ public class StoreService {
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_UPDATE_SUCCESS);
     }
 
+    @Transactional
+    public ApiResponse<StoreResponseDto> getStore(Long storeId) {
+        Store store = findByStoreId(storeId);
+        Menu menu = menuRepository.findByStore(store).orElseThrow(() -> new HandleNotFound(ApiResponseMenuEnum.MENU_NOT_FOUND));
+        StoreResponseDto storeResponseDto = StoreResponseDto.of(store,menu);
+        return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storeResponseDto);
+    }
+
 
 
     /**
@@ -66,7 +79,6 @@ public class StoreService {
     public Store findByStoreId(Long storeId) {
         return storeRepository.findById(storeId).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
     }
-
 
 
     /**
