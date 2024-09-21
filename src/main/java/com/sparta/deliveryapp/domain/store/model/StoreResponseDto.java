@@ -1,7 +1,10 @@
 package com.sparta.deliveryapp.domain.store.model;
 
+import com.sparta.deliveryapp.domain.menu.dto.MenuResponse;
+import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -9,6 +12,7 @@ import java.time.LocalTime;
 /**
  * 단건 가게 조회
  */
+@Getter
 @AllArgsConstructor
 public class StoreResponseDto {
     private Long id;
@@ -19,10 +23,11 @@ public class StoreResponseDto {
     private boolean isClose;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    // TODO: 메뉴 목록들 볼 수 있어야함
+    private MenuResponse menu;
 
     // Dto -> Entity
-    public StoreResponseDto of(Store store) {
+    public static StoreResponseDto of(Store store, Menu menu) {
+        MenuResponse menuResponse = new MenuResponse(menu);
         return new StoreResponseDto(
                 store.getId(),
                 store.getStoreName(),
@@ -31,7 +36,8 @@ public class StoreResponseDto {
                 store.getMinOrderAmount(),
                 store.isClose(),
                 store.getCreatedAt(),
-                store.getUpdatedAt()
+                store.getUpdatedAt(),
+                menuResponse
         );
     }
 }

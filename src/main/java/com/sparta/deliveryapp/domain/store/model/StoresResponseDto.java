@@ -28,7 +28,8 @@ public class StoresResponseDto {
                 store.getMinOrderAmount(),
                 store.isClose(),
                 store.getCreatedAt(),
-                store.getUpdatedAt()
+                store.getUpdatedAt(),
+                null
         );
     }
 }

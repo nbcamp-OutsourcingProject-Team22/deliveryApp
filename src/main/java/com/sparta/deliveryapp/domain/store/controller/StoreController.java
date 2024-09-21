@@ -1,8 +1,9 @@
 package com.sparta.deliveryapp.domain.store.controller;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.StoreService;
+import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
+import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,13 @@ public class StoreController {
     ) {
         ApiResponse<Void> result = storeService.updateStore(storeId, storeRequestDto);
         return ApiResponse.of(result);
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<StoreResponseDto>> getStore(
+            @PathVariable Long storeId
+    ) {
+        ApiResponse<StoreResponseDto> result = storeService.getStore(storeId);
+        return ApiResponse.of(result,result.getData());
     }
 }
