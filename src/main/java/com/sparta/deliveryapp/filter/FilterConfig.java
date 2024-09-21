@@ -20,5 +20,7 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/menu/*", "/order/*", "/store/*", "/members/*"); // 필터가 적용될 URL 패턴 설정
         return registrationBean;
     }
+
+
 }
 

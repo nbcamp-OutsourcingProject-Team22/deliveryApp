@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.domain.order.controller;
 
+import com.sparta.deliveryapp.annotation.TrackOrder;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
@@ -17,6 +18,7 @@ public class OrderUserController {
     private final OrderService orderService;
 
     // 추후 사용자 정보 받아야함
+    @TrackOrder
     @PostMapping("/request")
     public ResponseEntity<OrderResponseDto> requestOrder(@RequestBody OrderRequestDto orderRequestDto){
 
@@ -27,6 +29,7 @@ public class OrderUserController {
     }
 
     // 추후 사용자 정보 받아야함
+    @TrackOrder
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderOwnerResponseDto> checkOrder(@PathVariable long orderId){
 

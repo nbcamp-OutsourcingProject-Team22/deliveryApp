@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.domain.order.controller;
 
+import com.sparta.deliveryapp.annotation.TrackOrder;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.entity.Member;
@@ -14,18 +15,21 @@ public class OrderOwnerController {
 
     private final OrderService orderService;
 
+    @TrackOrder
     @PutMapping("/{orderId}/accept")
     public ResponseEntity<OrderOwnerResponseDto> acceptOrder(@PathVariable long orderId){
         Member member = new Member();
         return ResponseEntity.ok(orderService.acceptOrder(member, orderId));
     }
 
+    @TrackOrder
     @PutMapping("/{orderId}/reject")
     public ResponseEntity<OrderOwnerResponseDto> rejectOrder(@PathVariable long orderId){
         Member member = new Member();
         return ResponseEntity.ok(orderService.rejectOrder(member, orderId));
     }
 
+    @TrackOrder
     @PutMapping("/{orderId}/next")
     public ResponseEntity<OrderOwnerResponseDto> proceedOrder(@PathVariable long orderId){
         Member member = new Member();

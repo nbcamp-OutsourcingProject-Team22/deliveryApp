@@ -1,4 +1,4 @@
-package com.sparta.deliveryapp.domain.Order;
+package com.sparta.deliveryapp.domain.Order.service;
 
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
