@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-
+@Table(name = "`order`")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
