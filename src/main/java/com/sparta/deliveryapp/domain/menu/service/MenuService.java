@@ -4,7 +4,7 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMenuEnum;
 import com.sparta.deliveryapp.domain.menu.dto.MenuRequest;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
-import com.sparta.deliveryapp.domain.store.StoreService;
+import com.sparta.deliveryapp.domain.store.service.StoreService;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import lombok.RequiredArgsConstructor;

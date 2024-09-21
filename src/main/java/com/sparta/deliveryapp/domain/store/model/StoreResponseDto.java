@@ -25,6 +25,17 @@ public class StoreResponseDto {
     private LocalDateTime updatedAt;
     private MenuResponse menu;
 
+    public StoreResponseDto(Long id, String storeName, LocalTime openingTime, LocalTime closingTime, Integer minOrderAmount, boolean isClose, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.storeName = storeName;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.minOrderAmount = minOrderAmount;
+        this.isClose = isClose;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     // Dto -> Entity
     public static StoreResponseDto of(Store store, Menu menu) {
         MenuResponse menuResponse = new MenuResponse(menu);
