@@ -1,10 +1,13 @@
 package com.sparta.deliveryapp.domain.store;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.domain.menu.dto.MenuRequest;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
+import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
+import com.sparta.deliveryapp.domain.store.service.StoreService;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleNotFound;
@@ -16,9 +19,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -188,6 +193,61 @@ class StoreServiceTest {
                     expectedExceptionMessage,
                     actualException.getApiResponseEnum().getMessage()
             );
+        }
+    }
+    @Nested
+    public class 가게_다건_조회_테스트 {
+        @Test
+        @DisplayName("가게 다건 조회 성공 _ 가게 이름 공백")
+        void test1() {
+            // given - 가게 이름 없을때 다건 조회, 가게 준비, 페이지 정보 준비
+            String expectedMessage = "가게 조회에 성공 하였습니다";
+            Store store = Store.of(createStoreDto);
+            List<Store> stores = List.of(store);
+            String storeName = "";
+            int page = 1;
+            int size = 10;
+            String sort = "asc";
+            Sort.Direction direction = Sort.Direction.fromString(sort);
+            Pageable pageable = PageRequest.of(page,size,direction,"createdAt");
+            Page<Store> storePage = new PageImpl<>(stores,pageable,stores.size());
+            given(storeRepository.findAll(pageable)).willReturn(storePage);
+
+            // when - 가게 다건 조회 시도
+            ApiResponse<List<StoresResponseDto>> actualData = storeService.getStores(storeName,pageable);
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedMessage,
+                    actualData.getMessage()
+            );
+
+        }
+        @Test
+        @DisplayName("가게 다건 조회 성공 _ 가게 이름 있음")
+        void test2() {
+            // given - 가게 이름 있을때 다건 조회, 가게 준비, 페이지 정보 준비
+            String expectedMessage = "가게 조회에 성공 하였습니다";
+            Store store = Store.of(createStoreDto);
+            List<Store> stores = List.of(store);
+            String storeName = "test";
+            int page = 1;
+            int size = 10;
+            String sort = "asc";
+            Sort.Direction direction = Sort.Direction.fromString(sort);
+            Pageable pageable = PageRequest.of(page,size,direction,"createdAt");
+            Page<Store> storePage = new PageImpl<>(stores,pageable,stores.size());
+            given(storeRepository.findAllByStoreNameContaining(storeName,pageable)).willReturn(storePage);
+
+            // when - 가게 다건 조회 시도
+            ApiResponse<List<StoresResponseDto>> actualData = storeService.getStores(storeName,pageable);
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedMessage,
+                    actualData.getMessage()
+            );
+
         }
     }
 }
