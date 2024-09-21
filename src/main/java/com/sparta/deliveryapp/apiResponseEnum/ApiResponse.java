@@ -2,7 +2,7 @@ package com.sparta.deliveryapp.apiResponseEnum;
 
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
-
+// 공통된 response 를 갖기 위해
 @Getter
 public class ApiResponse<T> {
 

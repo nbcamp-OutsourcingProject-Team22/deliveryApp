@@ -1,6 +1,7 @@
 package com.sparta.deliveryapp.domain.store.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMenuEnum;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
@@ -45,9 +46,7 @@ public class StoreService {
      * @return 조회된 store 반환
      */
     @Transactional(readOnly = true)
-    public Store findByStoreId(Long storeId) {
-        return storeRepository.findById(storeId).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
-    }
+    public Store findByStoreId(Long storeId) {return storeRepository.findById(storeId).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));}
 
     /**
      * 사장 id로 가게 몇개 개설했는지 찾는 메서드
