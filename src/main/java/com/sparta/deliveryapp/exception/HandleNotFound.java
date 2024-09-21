@@ -7,6 +7,6 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
  */
 public class HandleNotFound extends BaseException {
     public HandleNotFound(ApiResponseEnumImpl apiResponseEnum) {
-        super(apiResponseEnum); // super 를 통해서 apiResponseEnum 를 baseException 에게 던져주는 것
+        super(apiResponseEnum);
     }
 }
