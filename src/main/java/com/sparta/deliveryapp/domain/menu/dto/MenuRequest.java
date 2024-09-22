@@ -1,10 +1,10 @@
 package com.sparta.deliveryapp.domain.menu.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalTime;
-
+@AllArgsConstructor
 @Getter
 public class MenuRequest {
 

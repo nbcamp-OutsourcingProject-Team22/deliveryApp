@@ -1,8 +1,10 @@
 package com.sparta.deliveryapp.entity;
 
 
-import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.common.Timestamped;
+import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
+import com.sparta.deliveryapp.domain.store.validator.StoreValid;
+import com.sparta.deliveryapp.exception.HandleNotFound;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +36,7 @@ public class Store extends Timestamped {
     private Integer minOrderAmount;
 
     @Column(nullable = false)
-    private boolean isClose;
+    private Boolean isClose;
 
     public static Store of(StoreRequestDto requestDto) {
         return new Store(
@@ -45,6 +47,18 @@ public class Store extends Timestamped {
                 requestDto.getMinOrderAmount(),
                 false
         );
+    }
+
+    public void closed() {
+        this.isClose = true;
+    }
+
+    /**
+     * 폐업 여부 확인
+     * @throws HandleNotFound 가게가 폐업 상태일때 발생되는 예외
+     */
+    public void isClosed() {
+        StoreValid.isCloseStore(this);
     }
 
     /**
