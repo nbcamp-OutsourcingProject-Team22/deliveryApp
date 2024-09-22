@@ -42,11 +42,16 @@ public class StoreController {
         return ApiResponse.of(result);
     }
 
-    @GetMapping("/{storeId}")
+    /**
+     * 가게 단건 조회
+     * @param storeName 조회할 가게
+     * @return 조회된 가게 반환 (메뉴포함, 없으면 null 처리)
+     */
+    @GetMapping("/{storeName}")
     public ResponseEntity<ApiResponse<StoreResponseDto>> getStore(
-            @PathVariable Long storeId
+            @PathVariable String storeName
     ) {
-        ApiResponse<StoreResponseDto> result = storeService.getStore(storeId);
+        ApiResponse<StoreResponseDto> result = storeService.getStore(storeName);
         return ApiResponse.of(result,result.getData());
     }
 

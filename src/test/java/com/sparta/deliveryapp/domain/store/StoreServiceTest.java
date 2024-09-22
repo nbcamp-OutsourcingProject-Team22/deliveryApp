@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -129,8 +128,8 @@ class StoreServiceTest {
         @DisplayName("가게 조회 성공")
         void test1() {
             // given - 가게 조회 생성 준비 상황
-            Long storeId = 1L;
             Store expectedStore = Store.of(createStoreDto);
+            String storeName = expectedStore.getStoreName();
             Menu menu = new Menu(
                     null,
                     menuRequest.getMenuName(),
@@ -138,17 +137,16 @@ class StoreServiceTest {
                     menuRequest.getMenuDescription(),
                     expectedStore
             );
-            ReflectionTestUtils.setField(expectedStore,"id",storeId);
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(expectedStore));
+            given(storeRepository.findByStoreName(storeName)).willReturn(Optional.of(expectedStore));
             given(menuRepository.findByStore(expectedStore)).willReturn(Optional.of(menu));
 
             // when - 가게 조회 시도
-            StoreResponseDto actualData = storeService.getStore(storeId).getData();
+            StoreResponseDto actualData = storeService.getStore(storeName).getData();
 
             //then - 예상한 store 아이디와, 데이터로 넘오온 store 아이디가 일치하는지 확인
             assertEquals(
-                    expectedStore.getId(),
-                    actualData.getId()
+                    expectedStore.getStoreName(),
+                    actualData.getStoreName()
             );
         }
 
@@ -156,13 +154,13 @@ class StoreServiceTest {
         @DisplayName("가게 단건 조회 실패 _ 가게 조회되지않음")
         void test2() {
             // given - 가게 조회 생성 준비 상황
-            Long storeId = 1L;
+            String storeName = createStoreDto.getStoreName();
             String expectedExceptionMessage = "가게를 찾을 수 없습니다";
-            given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+            given(storeRepository.findByStoreName(storeName)).willReturn(Optional.empty());
 
             // when - 가게 조회 시도
             HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
-                    storeService.getStore(storeId)
+                    storeService.getStore(storeName)
             );
 
             //then - 예상한 예외 메시지와 동일한지 확인

@@ -64,8 +64,8 @@ public class StoreService {
     }
 
     @Transactional
-    public ApiResponse<StoreResponseDto> getStore(Long storeId) {
-        Store store = findByStoreId(storeId);
+    public ApiResponse<StoreResponseDto> getStore(String storeName) {
+        Store store = findByStoreName(storeName);
         Menu menu = menuRepository.findByStore(store).orElse(null);
         StoreResponseDto storeResponseDto;
         if (menu == null) {
@@ -80,7 +80,6 @@ public class StoreService {
     }
 
     /**
-     *
      *
      * @param storeName
      * @param pageable
@@ -108,6 +107,17 @@ public class StoreService {
     @Transactional(readOnly = true)
     public Store findByStoreId(Long storeId) {
         return storeRepository.findById(storeId).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
+    }
+
+    /**
+     * storeName로 가게 찾는 메서드
+     *
+     * @param storeName 가게 찾을 storeName
+     * @return 조회된 store 반환
+     */
+    @Transactional(readOnly = true)
+    public Store findByStoreName(String storeName) {
+        return storeRepository.findByStoreName(storeName).orElseThrow(() -> new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
     }
 
     /**
