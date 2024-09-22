@@ -1,19 +1,18 @@
-package com.sparta.deliveryapp.domain.Order;
+package com.sparta.deliveryapp.domain.Order.service;
 
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
+import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.*;
 import jakarta.persistence.EntityNotFoundException;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -66,9 +65,9 @@ public class OrderCheckTest {
         given(order.getMember().getId()).willReturn(1L);
         given(member.getId()).willReturn(1L);
 
-        String ret = orderService.checkOrder(member,order.getId());
+        OrderOwnerResponseDto ret = orderService.checkOrder(member,order.getId());
 
-        assertThat(ret).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
+        assertThat(ret.getProcess()).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
     }
 
 
