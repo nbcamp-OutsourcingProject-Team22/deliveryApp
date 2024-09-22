@@ -45,7 +45,7 @@ public class StoreResponseDto {
                 store.getOpeningTime(),
                 store.getClosingTime(),
                 store.getMinOrderAmount(),
-                store.isClose(),
+                store.getIsClose(),
                 store.getCreatedAt(),
                 store.getUpdatedAt(),
                 menuResponse
@@ -60,7 +60,7 @@ public class StoreResponseDto {
                 store.getOpeningTime(),
                 store.getClosingTime(),
                 store.getMinOrderAmount(),
-                store.isClose(),
+                store.getIsClose(),
                 store.getCreatedAt(),
                 store.getUpdatedAt(),
                 null
