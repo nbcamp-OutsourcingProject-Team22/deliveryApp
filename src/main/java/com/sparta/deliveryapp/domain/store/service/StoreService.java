@@ -63,6 +63,11 @@ public class StoreService {
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_UPDATE_SUCCESS);
     }
 
+    /**
+     *  단건 가게 반환 (철자 정확히 일치해야함)
+     * @param storeName 찾고자 하는 가게
+     * @return 조회된 가게 반환 (메뉴 있으면 메뉴 포함하여 반환)
+     */
     @Transactional
     public ApiResponse<StoreResponseDto> getStore(String storeName) {
         Store store = findByStoreName(storeName);
@@ -80,10 +85,11 @@ public class StoreService {
     }
 
     /**
+     * 클라이언트로부터 들어온 문자열과, 일부 일치하는 가게 전부 반환 메서드
      *
-     * @param storeName
-     * @param pageable
-     * @return
+     * @param storeName 조회할 가게 이름
+     * @param pageable 페이지 정보 (page,size,sort)
+     * @return 조회된 가게들 반환
      */
     @Transactional
     public ApiResponse<List<StoresResponseDto>> getStores(String storeName, Pageable pageable) {
@@ -96,6 +102,19 @@ public class StoreService {
             List<StoresResponseDto> storesResponse = page.map(StoresResponseDto::of).toList();
             return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storesResponse);
         }
+    }
+
+    /**
+     * 가게 폐업 메서드
+     * @param storeId 폐업할 가게
+     * @return 폐업 성공 내용 반환
+     */
+    @Transactional
+    public ApiResponse<Void> closeStore(Long storeId) {
+        Store store = findByStoreId(storeId);
+        // 폐업 전환
+        store.closed();
+        return new ApiResponse<>(ApiResponseStoreEnum.STORE_CLOSE_SUCCESS);
     }
 
     /**
@@ -140,6 +159,7 @@ public class StoreService {
     public Page<Store> findAllStorePage(Pageable pageable) {
         return storeRepository.findAll(pageable);
     }
+
 
 
 

@@ -32,6 +32,7 @@ public class StoreController {
         return ApiResponse.of(result);
     }
 
+    // TODO: 사용자 받아야함 @Auth 같은걸로
     @PutMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>>  updateStore(
 //            @Auth AuthUser authUser,
@@ -75,5 +76,16 @@ public class StoreController {
         Pageable pageable = PageRequest.of(page, size, direction,"createdAt");
         ApiResponse<List<StoresResponseDto>> result = storeService.getStores(storeName,pageable);
         return ApiResponse.of(result,result.getData());
+    }
+
+    /**
+     * 가게 폐업 메서드
+     * @param storeId 폐업할 가게
+     * @return 폐업성공 메세지
+     */
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<Void>> closeStore(@PathVariable Long storeId) {
+        ApiResponse<Void> result = storeService.closeStore(storeId);
+        return ApiResponse.of(result);
     }
 }
