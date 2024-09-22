@@ -124,7 +124,7 @@ class StoreServiceTest {
         }
     }
     @Nested
-    public class 가게_조회_테스트 {
+    public class 가게_단건_조회_테스트 {
         @Test
         @DisplayName("가게 조회 성공")
         void test1() {
@@ -153,7 +153,7 @@ class StoreServiceTest {
         }
 
         @Test
-        @DisplayName("가게 조회 실패 _ 가게 조회되지않음")
+        @DisplayName("가게 단건 조회 실패 _ 가게 조회되지않음")
         void test2() {
             // given - 가게 조회 생성 준비 상황
             Long storeId = 1L;
@@ -163,29 +163,6 @@ class StoreServiceTest {
             // when - 가게 조회 시도
             HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
                     storeService.getStore(storeId)
-            );
-
-            //then - 예상한 예외 메시지와 동일한지 확인
-            assertEquals(
-                    expectedExceptionMessage,
-                    actualException.getApiResponseEnum().getMessage()
-            );
-        }
-
-        @Test
-        @DisplayName("가게 조회 실패 _ 메뉴 조회되지않음")
-        void test3() {
-            // given - 가게 조회 생성 준비 상황
-            Long storeId = 1L;
-            Store store = Store.of(createStoreDto);
-            String expectedExceptionMessage = "메뉴를 찾을 수 없습니다.";
-            ReflectionTestUtils.setField(store,"id",storeId);
-            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
-            given(menuRepository.findByStore(store)).willReturn(Optional.empty());
-
-            // when - 가게 조회 시도
-            HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
-                storeService.getStore(storeId)
             );
 
             //then - 예상한 예외 메시지와 동일한지 확인

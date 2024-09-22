@@ -36,7 +36,7 @@ public class StoreResponseDto {
         this.updatedAt = updatedAt;
     }
 
-    // Dto -> Entity
+    // Dto -> Entity menu 있음
     public static StoreResponseDto of(Store store, Menu menu) {
         MenuResponse menuResponse = new MenuResponse(menu);
         return new StoreResponseDto(
@@ -49,6 +49,21 @@ public class StoreResponseDto {
                 store.getCreatedAt(),
                 store.getUpdatedAt(),
                 menuResponse
+        );
+    }
+
+    // Dto -> Entity menu 없음
+    public static StoreResponseDto of(Store store) {
+        return new StoreResponseDto(
+                store.getId(),
+                store.getStoreName(),
+                store.getOpeningTime(),
+                store.getClosingTime(),
+                store.getMinOrderAmount(),
+                store.isClose(),
+                store.getCreatedAt(),
+                store.getUpdatedAt(),
+                null
         );
     }
 }
