@@ -141,24 +141,24 @@ public class StoreService {
     }
 
     /**
-     *  storeName이 포함되는 가게 전부 찾기, 없으면 빈 List 반환
+     *  storeName이 포함되는 가게 전부 찾기,false인것들만 반환함, 없으면 빈 List 반환
      * @param storeName 찾을 가게명
      * @param pageable 조회 하고자 하는 페이지 정보
      * @return 가게명이 포함되는 가게 전부 반환 (자음 + 모음 합친것만 가능)
      */
     @Transactional(readOnly = true)
     public Page<Store> findAllByStoreNameAndPage(String storeName, Pageable pageable) {
-        return storeRepository.findAllByStoreNameContaining(storeName,pageable);
+        return storeRepository.findAllByStoreNameContainingAndIsCloseFalse(storeName,pageable);
     }
 
     /**
-     * storeName이 공백일떄는 모든 가게를 반환시키기 위한 메서드
+     * storeName이 공백일때는 모든 가게를 반환하는데, close 여부가 false인것들만 반환함
      * @param pageable 조회 하고자 하는 페이지 정보
      * @return 모든 가게 반환
      */
     @Transactional(readOnly = true)
     public Page<Store> findAllStorePage(Pageable pageable) {
-        return storeRepository.findAll(pageable);
+        return storeRepository.findAllByIsCloseFalse(pageable);
     }
 
 
