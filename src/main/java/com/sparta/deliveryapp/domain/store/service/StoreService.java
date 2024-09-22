@@ -1,7 +1,6 @@
 package com.sparta.deliveryapp.domain.store.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMenuEnum;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
@@ -67,8 +66,16 @@ public class StoreService {
     @Transactional
     public ApiResponse<StoreResponseDto> getStore(Long storeId) {
         Store store = findByStoreId(storeId);
-        Menu menu = menuRepository.findByStore(store).orElseThrow(() -> new HandleNotFound(ApiResponseMenuEnum.MENU_NOT_FOUND));
-        StoreResponseDto storeResponseDto = StoreResponseDto.of(store,menu);
+        Menu menu = menuRepository.findByStore(store).orElse(null);
+        StoreResponseDto storeResponseDto;
+        if (menu == null) {
+            // 메뉴가 없다면 menu는 null로 처리하기위하여, store만 넣어줌
+            storeResponseDto = StoreResponseDto.of(store);
+        } else {
+            // 메뉴가 있다면 메뉴 넣어서 처리
+            storeResponseDto = StoreResponseDto.of(store,menu);
+        }
+
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storeResponseDto);
     }
 
