@@ -1,17 +1,18 @@
-package com.sparta.deliveryapp.domain.Order.service;
+package com.sparta.deliveryapp.domain.order.service;
 
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
+import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
-import com.sparta.deliveryapp.domain.order.service.OrderService;
 
 import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
+import com.sparta.deliveryapp.exception.HandleNotFound;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void Order_주문생성() {
+    void Order_주문저장() {
         // given
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
 
@@ -74,10 +75,10 @@ public class OrderServiceTest {
 
 
         // when
-        OrderResponseDto response = orderService.requestOrder(member, orderRequestDto);
+        String response = orderService.requestOrder(member, orderRequestDto).getMessage();
 
         // then
-        assertThat(response.getOrderId()).isEqualTo(1L);
+        assertThat(response).isEqualTo("주문 저장에 성공하였습니다.");
     }
 
 
@@ -89,11 +90,11 @@ public class OrderServiceTest {
         given(storeRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
             orderService.requestOrder(member, orderRequestDto);
         });
 
-        assertEquals("가게를 찾을 수 없습니다.",exception.getMessage());
+        assertEquals("가게를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());
     }
 
     @Test
@@ -108,10 +109,10 @@ public class OrderServiceTest {
         given(menuRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+        HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
             orderService.requestOrder(member, orderRequestDto);
         });
 
-        assertEquals("메뉴를 찾을 수 없습니다.",exception.getMessage());
+        assertEquals("메뉴를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());
     }
 }

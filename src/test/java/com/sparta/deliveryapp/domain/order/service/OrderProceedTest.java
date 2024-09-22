@@ -1,15 +1,17 @@
-package com.sparta.deliveryapp.domain.Order.service;
+package com.sparta.deliveryapp.domain.order.service;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
-import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
+import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.InvalidRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,9 +65,10 @@ public class OrderProceedTest {
 
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        OrderOwnerResponseDto ret = orderService.proceedOrder(member, order.getId());
+        ApiResponse<OrderOwnerResponseDto> ret = orderService.proceedOrder(member, order.getId());
 
-        assertThat(ret.getProcess()).isEqualTo("IN DELIVERY");
+        assertThat(ret.getMessage()).isEqualTo("주문 진행에 성공하였습니다.");
+        assertThat(ret.getData().getProcess()).isEqualTo("IN DELIVERY");
 
     }
     @Test
@@ -74,11 +77,11 @@ public class OrderProceedTest {
         ReflectionTestUtils.setField(order, "id", 1L);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()->{
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
             orderService.proceedOrder(member, order.getId());
         });
 
-        assertEquals("이미 완료된 주문입니다.",exception.getMessage());
+        assertEquals("완료된 주문입니다.",exception.getApiResponseEnum().getMessage());
 
     }
     @Test
@@ -87,10 +90,10 @@ public class OrderProceedTest {
         ReflectionTestUtils.setField(order, "id", 1L);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()->{
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
             orderService.proceedOrder(member, order.getId());
         });
 
-        assertEquals("이미 거부된 주문입니다.",exception.getMessage());
+        assertEquals("거부된 주문입니다.",exception.getApiResponseEnum().getMessage());
     }
 }

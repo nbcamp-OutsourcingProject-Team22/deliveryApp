@@ -1,12 +1,15 @@
-package com.sparta.deliveryapp.domain.Order.service;
+package com.sparta.deliveryapp.domain.order.service;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
+import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
-import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.*;
+import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,9 +68,10 @@ public class OrderCheckTest {
         given(order.getMember().getId()).willReturn(1L);
         given(member.getId()).willReturn(1L);
 
-        OrderOwnerResponseDto ret = orderService.checkOrder(member,order.getId());
+        ApiResponse<OrderUserResponseDto> ret = orderService.checkOrder(member,order.getId());
 
-        assertThat(ret.getProcess()).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
+        assertThat(ret.getMessage()).isEqualTo("주문 조회에 성공하였습니다.");
+        assertThat(ret.getData().getProcess()).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
     }
 
 
@@ -75,11 +79,11 @@ public class OrderCheckTest {
     void 주문_없음() {
         given(orderRepository.findById(anyLong())).willReturn(Optional.empty());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,()->{
+        HandleNotFound exception = assertThrows(HandleNotFound.class,()->{
             orderService.checkOrder(member,order.getId());
         });
 
-        assertEquals("주문을 찾을 수 없습니다.", exception.getMessage());
+        assertEquals("주문을 찾을 수 없습니다.", exception.getApiResponseEnum().getMessage());
     }
 
     @Test
@@ -92,11 +96,11 @@ public class OrderCheckTest {
         given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
 
         // order의 member와 테스트의 member가 다름
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
             orderService.checkOrder(otherMember, order.getId());
         });
 
-        assertEquals("해당 주문에 대한 권한이 없습니다.", exception.getMessage());
+        assertEquals("권한이 없습니다.", exception.getApiResponseEnum().getMessage());
 
     }
 }
