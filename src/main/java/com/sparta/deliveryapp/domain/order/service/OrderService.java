@@ -1,13 +1,20 @@
 package com.sparta.deliveryapp.domain.order.service;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseOrderEnum;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
+import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.*;
+import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
+import com.sparta.deliveryapp.exception.InvalidRequestException;
 import com.sun.jdi.request.InvalidRequestStateException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,77 +37,78 @@ public class OrderService {
 
 
     @Transactional
-    public OrderResponseDto requestOrder(Member member, OrderRequestDto orderRequestDto) {
+    public ApiResponse<OrderResponseDto> requestOrder(Member member, OrderRequestDto orderRequestDto) {
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
-                .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다."));
+                .orElseThrow(() ->  new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND));
 
         Menu menu = menuRepository.findById(orderRequestDto.getMenuId())
-                .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MENU_NOT_FOUND));
 
 
         Order order = new Order(member,store,menu, OrderStatusEnum.REQUEST);
         Order savedOrder = orderRepository.save(order);
 
-        return new OrderResponseDto(savedOrder.getId());
+        OrderResponseDto orderResponseDto = new OrderResponseDto(savedOrder.getId());
+        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_SAVE_SUCCESS,orderResponseDto);
 
     }
 
-    public OrderOwnerResponseDto checkOrder(Member member, long orderId) {
+    public ApiResponse<OrderUserResponseDto> checkOrder(Member member, long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
         if(!Objects.equals(order.getMember().getId(), member.getId())) {
-            throw new IllegalArgumentException("해당 주문에 대한 권한이 없습니다.");
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
         }
 
-        OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return orderOwnerResponseDto;
+        OrderUserResponseDto orderUserResponseDto = new OrderUserResponseDto(order.getStore().getId(), order.getStatus().getProcess());
+        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_CHECK_SUCCESS,orderUserResponseDto);
     }
 
-    public OrderOwnerResponseDto acceptOrder(Member member, long orderId) {
+    public ApiResponse<OrderOwnerResponseDto> acceptOrder(Member member, long orderId) {
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
 //      checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
 
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return orderOwnerResponseDto;
+        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_ACCEPT_SUCCESS,orderOwnerResponseDto);
     }
 
-    public OrderOwnerResponseDto rejectOrder(Member member,long orderId) {
+    public ApiResponse<OrderOwnerResponseDto> rejectOrder(Member member,long orderId) {
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
 //        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return orderOwnerResponseDto;
+        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_REJECT_SUCCESS,orderOwnerResponseDto);
     }
 
-    public OrderOwnerResponseDto proceedOrder(Member member, long orderId) {
+    public ApiResponse<OrderOwnerResponseDto> proceedOrder(Member member, long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
 //        checkOwnerOfStore(order, member);
 
         if(order.getStatus()==OrderStatusEnum.DELIVERED){
-            throw new IllegalArgumentException("이미 완료된 주문입니다.");
+            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_COMPLETE);
         }
         if(order.getStatus()==OrderStatusEnum.REJECTED){
-            throw new IllegalArgumentException("이미 거부된 주문입니다.");
+            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_REJECT);
         }
 
         order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()]);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return orderOwnerResponseDto;
+        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_PROCEED_SUCCESS,orderOwnerResponseDto);
     }
 
     private Order checkOrderStatus(long orderId){
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
         if(!order.getStatus().equals(OrderStatusEnum.REQUEST)){
-            throw new IllegalArgumentException("이미 진행된 주문입니다.");
+            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_IN_PROGRESS);
         }
 
         return order;
