@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -77,7 +78,10 @@ class StoreServiceTest {
             String actualMessage = storeService.createStore(createStoreDto).getMessage();
 
             //then - 예상한 메시지와, 실제 메세지가 일치하는지 확인
-            assertEquals(expectedMessage,actualMessage);
+            assertEquals(
+                    expectedMessage,
+                    actualMessage
+            );
         }
     }
 
@@ -143,7 +147,7 @@ class StoreServiceTest {
             // when - 가게 조회 시도
             StoreResponseDto actualData = storeService.getStore(storeName).getData();
 
-            //then - 예상한 store 아이디와, 데이터로 넘오온 store 아이디가 일치하는지 확인
+            //then - 예상한 store 아이디와, 데이터로 넘오온 store 이름이 일치하는지 확인
             assertEquals(
                     expectedStore.getStoreName(),
                     actualData.getStoreName()
@@ -222,7 +226,48 @@ class StoreServiceTest {
                     expectedMessage,
                     actualData.getMessage()
             );
+        }
+    }
+    @Nested
+    public class 가게_폐업_테스트 {
+        @Test
+        @DisplayName("가게 폐업 성공")
+        void test1() {
+            // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long storeId = 1L;
+            String expectedMessage = "가게 폐업에 성공 하였습니다";
+            Store store = Store.of(createStoreDto);
+            ReflectionTestUtils.setField(store,"id",storeId);
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
 
+            // when - 가게 폐업 시도
+            String actualMessage = storeService.closeStore(storeId).getMessage();
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedMessage,
+                    actualMessage
+            );
+        }
+
+        @Test
+        @DisplayName("가게 폐업 실패 _ 가게 못찾음")
+        void test2() {
+            // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long storeId = 1L;
+            String expectedExceptionMessage = "가게를 찾을 수 없습니다";
+            given(storeRepository.findById(storeId)).willReturn(Optional.empty());
+
+            // when - 가게 폐업 시도
+            HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
+                    storeService.closeStore(storeId)
+            );
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedExceptionMessage,
+                    actualException.getApiResponseEnum().getMessage()
+            );
         }
     }
 }
