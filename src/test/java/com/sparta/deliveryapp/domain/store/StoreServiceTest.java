@@ -157,10 +157,31 @@ class StoreServiceTest {
         @Test
         @DisplayName("가게 단건 조회 실패 _ 가게 조회되지않음")
         void test2() {
-            // given - 가게 조회 생성 준비 상황
+            // given - 가게 조회 실패 준비 상황
             String storeName = createStoreDto.getStoreName();
             String expectedExceptionMessage = "가게를 찾을 수 없습니다";
             given(storeRepository.findByStoreName(storeName)).willReturn(Optional.empty());
+
+            // when - 가게 조회 시도
+            HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
+                    storeService.getStore(storeName)
+            );
+
+            //then - 예상한 예외 메시지와 동일한지 확인
+            assertEquals(
+                    expectedExceptionMessage,
+                    actualException.getApiResponseEnum().getMessage()
+            );
+        }
+        @Test
+        @DisplayName("가게 단건 조회 실패 _ 가게 폐업")
+        void test3() {
+            // given - 가게 조회 생성 준비 상황, 가게 폐업 실행
+            Store expectedStore = Store.of(createStoreDto);
+            expectedStore.closed();
+            String storeName = createStoreDto.getStoreName();
+            String expectedExceptionMessage = "해당 가게는 폐업 하였습니다";
+            given(storeRepository.findByStoreName(storeName)).willReturn(Optional.of(expectedStore));
 
             // when - 가게 조회 시도
             HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
