@@ -4,8 +4,8 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.config.PasswordEncoder;
 import com.sparta.deliveryapp.config.PasswordUtils;
-import com.sparta.deliveryapp.domain.dto.request.SignInRequestDto;
-import com.sparta.deliveryapp.domain.dto.request.SignupRequestDto;
+import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
+import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.entity.Members;
@@ -99,8 +99,7 @@ public class MemberService {
         if (!passwordEncoder.matches(requestDto.getPassword(),member.getPassword() )){
             throw new IllegalArgumentException("비밀번호를 확인해주세요");
         }
-
-        String token = jwtUtil.createToken(member.getId(), member.getUserRole());
+        String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
         return token;
     }

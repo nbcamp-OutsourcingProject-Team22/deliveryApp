@@ -40,13 +40,14 @@ public class JwtUtil {
     }
 
     //토큰 생성
-    public String createToken(Integer userId, UserRole userRole) {
+    public String createToken(Integer userId, String username, UserRole userRole) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(String.valueOf(userId))
-                        .claim(AUTHORIZATION_KEY, userRole)
+                        .claim("username", username)
+                        .claim("role", userRole.name())
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -78,5 +79,13 @@ public class JwtUtil {
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return false;
+    }
+
+    public Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token.replace(BEARER_PREFIX, ""))
+                .getBody();
     }
 }

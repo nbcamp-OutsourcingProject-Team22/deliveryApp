@@ -1,21 +1,17 @@
 package com.sparta.deliveryapp.domain.member.controller;
 
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.domain.dto.request.SignInRequestDto;
-import com.sparta.deliveryapp.domain.dto.request.SignupRequestDto;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
+import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.response.AuthInfoResponseDto;
 import com.sparta.deliveryapp.domain.member.service.MemberService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/members")
@@ -43,15 +39,8 @@ public class MemberController {
     public ResponseEntity<Void> signIn(@RequestBody SignInRequestDto requestDto, HttpServletResponse response) {
         String token = memberService.signIn(requestDto, response);
 
-
-        //cookie 저장
-        String encodedValue = URLEncoder.encode(token, StandardCharsets.UTF_8);
-        Cookie cookie = new Cookie("jwtToken",encodedValue);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
-
+        //header 저장
+        response.setHeader("Authorization", token);
         return ResponseEntity.ok().build();
     }
 }
