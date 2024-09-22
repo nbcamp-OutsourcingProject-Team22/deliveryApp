@@ -8,6 +8,8 @@ public enum ApiResponseStoreEnum implements ApiResponseEnumImpl {
     // 200
     STORE_SAVE_SUCCESS(HttpStatus.OK.value(), "가게 저장에 성공 하였습니다"),
     STORE_UPDATE_SUCCESS(HttpStatus.OK.value(), "가게 업데이트에 성공 하였습니다"),
+    STORE_GET_SUCCESS(HttpStatus.OK.value(), "가게 조회에 성공 하였습니다"),
+    STORE_CLOSE_SUCCESS(HttpStatus.OK.value(), "가게 폐업에 성공 하였습니다"),
 
     // 400
     STORE_MAX(HttpStatus.BAD_REQUEST.value(),"가게는 3개까지 만들 수 있습니다"),
