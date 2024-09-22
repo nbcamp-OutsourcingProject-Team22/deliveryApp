@@ -26,67 +26,61 @@ public class AspectModule {
     private void trackOrderAnnotation(){}
 
 
+    // 요청시각, 주문id, 가게 id 필수
+    // 1. requestOrder  -> 입력으로 storeId, menuId 반환으로 주문 id
+    // 2. 나머지          -> 입력으로 orderId, 반환으로 storeId
+
     @Around("trackOrderAnnotation()")
     public Object trackOrder(ProceedingJoinPoint joinPoint) throws Throwable {
         // API 요청 시각
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = LocalDateTime.now().format(formatter);
+        LocalDateTime requestTime = LocalDateTime.now();
 
-        Object result = null;
-        try {
-            result = joinPoint.proceed();  // 메서드 실행
-        } finally {
-            log.info("::: API 요청 시각 : {} :::", formattedDate);
+        // 위 주석에 따라 requestOrder는 동작이 다르기 때문에 메서드 이름으로 구분
+        String methodName = joinPoint.getSignature().getName();
 
-            // 메서드의 파라미터로 전달된 OrderRequestDto 객체 추출
-            Object[] args = joinPoint.getArgs();
-            OrderRequestDto orderRequestDto = null;
+        // 메서드의 파라미터 가져오기
+        Object[] args = joinPoint.getArgs();
 
-            for (Object arg : args) {
-                if (arg instanceof OrderRequestDto) {
-                    orderRequestDto = (OrderRequestDto) arg;
-                    break;
-                }
-            }
+        Long orderId = null;
+        Long storeId = null;
 
-            if (orderRequestDto != null) {
-                log.info("::: 가게 ID : {} :::", orderRequestDto.getStoreId());
-            }
+        if(methodName.equals("requestOrder")){
+            OrderRequestDto OrderRequestDto = (OrderRequestDto) args[0];
+            storeId = OrderRequestDto.getStoreId();
 
-            // 반환된 정보에서 출력
-            OrderResponseDto response = (OrderResponseDto) result;
-            if (response != null) {
-                log.info("::: 주문 ID : {} :::", response.getOrderId());
-            }
+            log.info("::: API 요청 시각 : {} :::", requestTime);
+            log.info("::: 가게 Id : {} :::", storeId);
+        }
+        else{
+            orderId = (Long) args[0];
+            log.info("::: API 요청 시각 : {} :::", requestTime);
+            log.info("::: 주문 Id : {} :::", orderId);
         }
 
-        return result;  // 메서드 실행 결과 반환
-    }
-
-    // orderId가 입력으로 들어가고, storeId와 상태가 반환된다.
-    @Around("trackOrderAnnotation() && args(orderId, ..)")
-    public Object trackOrderWithId(ProceedingJoinPoint joinPoint, long orderId) throws Throwable {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-
-        // API 요청 시각
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = LocalDateTime.now().format(formatter);
-
         Object result = null;
-        try {
-            result = joinPoint.proceed();  // 메서드 실행
-        } finally {
-            log.info("::: API 요청 시각 : {} :::", formattedDate);
-            log.info("::: 주문 ID : {} :::", orderId);
 
-            // 반환된 정보에서 출력
-            OrderOwnerResponseDto response = (OrderOwnerResponseDto) result;
-            if (response != null) {
-                log.info("::: 가게 ID : {} :::", response.getStoreId());
-                log.info("::: 상태 : {} :::", response.getProcess());
+        try{
+            result = joinPoint.proceed();
+        }catch(Exception e){
+            log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
+            throw e;
+
+        }finally {
+            if(methodName.equals("requestOrder")){
+                OrderResponseDto orderResponse = (OrderResponseDto) result;
+                orderId = orderResponse.getOrderId();
+                log.info("::: 주문 Id : {} :::", orderId);
             }
+            else{
+                OrderOwnerResponseDto orderOwnerResponseDto = (OrderOwnerResponseDto) result;
+                storeId = orderOwnerResponseDto.getStoreId();
+                log.info("::: 가게 Id : {} :::", storeId);
+            }
+
         }
 
-        return result;  // 메서드 실행 결과 반환
+        return result;
     }
+
+
 }
