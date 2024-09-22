@@ -1,17 +1,17 @@
 package com.sparta.deliveryapp.domain.member.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.apiResponseEnum.ApiResponseEnumImpl;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.config.PasswordEncoder;
 import com.sparta.deliveryapp.config.PasswordUtils;
-import com.sparta.deliveryapp.domain.dto.SignInRequestDto;
+import com.sparta.deliveryapp.domain.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.entity.Members;
 import com.sparta.deliveryapp.exception.InvalidRequestException;
 import com.sparta.deliveryapp.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -91,7 +91,7 @@ public class MemberService {
         return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
     }
 
-    public String signIn(SignInRequestDto requestDto) {
+    public String signIn(SignInRequestDto requestDto, HttpServletResponse response) {
         //email 조회
         Members member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -100,6 +100,8 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호를 확인해주세요");
         }
 
-        return jwtUtil.createToken(member.getId(), member.getUserRole());
+        String token = jwtUtil.createToken(member.getId(), member.getUserRole());
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+        return token;
     }
 }

@@ -1,4 +1,4 @@
-package com.sparta.deliveryapp.domain.dto;
+package com.sparta.deliveryapp.domain.dto.request;
 
 
 import jakarta.validation.constraints.Email;
