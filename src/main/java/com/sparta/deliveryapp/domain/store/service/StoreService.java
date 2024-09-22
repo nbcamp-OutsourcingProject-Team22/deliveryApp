@@ -71,6 +71,7 @@ public class StoreService {
     @Transactional
     public ApiResponse<StoreResponseDto> getStore(String storeName) {
         Store store = findByStoreName(storeName);
+        store.isClosed();
         Menu menu = menuRepository.findByStore(store).orElse(null);
         StoreResponseDto storeResponseDto;
         if (menu == null) {

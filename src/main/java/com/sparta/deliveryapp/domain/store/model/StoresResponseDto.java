@@ -30,7 +30,7 @@ public class StoresResponseDto {
                 store.getOpeningTime(),
                 store.getClosingTime(),
                 store.getMinOrderAmount(),
-                store.isClose(),
+                store.getIsClose(),
                 store.getCreatedAt(),
                 store.getUpdatedAt()
         );
