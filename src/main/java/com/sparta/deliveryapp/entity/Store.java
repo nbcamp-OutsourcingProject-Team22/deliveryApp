@@ -47,6 +47,10 @@ public class Store extends Timestamped {
         );
     }
 
+    public void closed() {
+        this.isClose = true;
+    }
+
     /**
      *  멤버와 1:N 관계
      */
