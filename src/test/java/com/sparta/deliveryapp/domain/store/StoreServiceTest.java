@@ -129,7 +129,7 @@ class StoreServiceTest {
     @Nested
     public class 가게_단건_조회_테스트 {
         @Test
-        @DisplayName("가게 조회 성공")
+        @DisplayName("가게 단건 조회 성공")
         void test1() {
             // given - 가게 조회 생성 준비 상황
             Store expectedStore = Store.of(createStoreDto);
@@ -211,7 +211,7 @@ class StoreServiceTest {
             Sort.Direction direction = Sort.Direction.fromString(sort);
             Pageable pageable = PageRequest.of(page,size,direction,"createdAt");
             Page<Store> storePage = new PageImpl<>(stores,pageable,stores.size());
-            given(storeRepository.findAll(pageable)).willReturn(storePage);
+            given(storeRepository.findAllByIsCloseFalse(pageable)).willReturn(storePage);
 
             // when - 가게 다건 조회 시도
             ApiResponse<List<StoresResponseDto>> actualData = storeService.getStores(storeName,pageable);
@@ -237,7 +237,7 @@ class StoreServiceTest {
             Sort.Direction direction = Sort.Direction.fromString(sort);
             Pageable pageable = PageRequest.of(page,size,direction,"createdAt");
             Page<Store> storePage = new PageImpl<>(stores,pageable,stores.size());
-            given(storeRepository.findAllByStoreNameContaining(storeName,pageable)).willReturn(storePage);
+            given(storeRepository.findAllByStoreNameContainingAndIsCloseFalse(storeName,pageable)).willReturn(storePage);
 
             // when - 가게 다건 조회 시도
             ApiResponse<List<StoresResponseDto>> actualData = storeService.getStores(storeName,pageable);
