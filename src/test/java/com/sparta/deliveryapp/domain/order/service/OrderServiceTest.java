@@ -2,18 +2,14 @@ package com.sparta.deliveryapp.domain.order.service;
 
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
-import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
-import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 
-import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleNotFound;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
