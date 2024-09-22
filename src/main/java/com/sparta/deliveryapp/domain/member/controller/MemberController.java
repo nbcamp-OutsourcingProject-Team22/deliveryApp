@@ -47,7 +47,7 @@ public class MemberController {
         //cookie 저장
         String encodedValue = URLEncoder.encode(token, StandardCharsets.UTF_8);
         Cookie cookie = new Cookie("jwtToken",encodedValue);
-        cookie.setPath("localhost:8080");
+        cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         response.addCookie(cookie);
