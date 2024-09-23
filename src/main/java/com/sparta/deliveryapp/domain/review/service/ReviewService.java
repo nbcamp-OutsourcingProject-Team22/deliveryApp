@@ -3,10 +3,8 @@ package com.sparta.deliveryapp.domain.review.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseReviewEnum;
-import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
-import com.sparta.deliveryapp.domain.review.dto.ReviewRatingResponseDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewRequestDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewResponseDto;
 import com.sparta.deliveryapp.domain.review.repository.ReviewRepository;
