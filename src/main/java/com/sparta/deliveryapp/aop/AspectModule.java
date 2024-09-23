@@ -6,6 +6,9 @@ import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
+import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
+import com.sparta.deliveryapp.exception.InvalidRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -56,10 +59,14 @@ public class AspectModule {
 
         try {
             result = joinPoint.proceed();
-        } catch (Exception e) {
-            log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
+//        } catch (Exception e) {
+//            log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
+//            throw e;
+        }catch(HandleNotFound | InvalidRequestException | HandleUnauthorizedException e){
+            log.info("{}", e.getMessage());
             throw e;
-        } finally {
+        }
+        finally {
             if (methodName.equals("requestOrder")) {
                 ResponseEntity<ApiResponse<OrderResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderResponseDto>>) result;
                 ApiResponse<OrderResponseDto> orderResponseDto = responseEntity.getBody();

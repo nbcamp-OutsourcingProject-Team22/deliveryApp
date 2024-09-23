@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -36,18 +35,17 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final OrderRepository orderRepository;
 
-
     // 주문 생성 (유저)
     @Transactional
     public ApiResponse<OrderResponseDto> requestOrder(AuthMember authMember, OrderRequestDto orderRequestDto) {
 
-        Member member = memberRepository.findById(authMember.getId())
-                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
-
-        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(member.getUserRole().equals(UserRole.OWNER)){
+        // 유저 전용 api
+        if(authMember.getRole().equals(UserRole.OWNER)){
             throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
                 .orElseThrow(() ->  new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
@@ -55,13 +53,13 @@ public class OrderService {
         Menu menu = menuRepository.findById(orderRequestDto.getMenuId())
                 .orElseThrow(() -> new HandleNotFound(ApiResponseMenuEnum.MENU_NOT_FOUND));
 
-
         Order order = new Order(
                 member,
                 store,
                 menu,
                 OrderStatusEnum.REQUEST
         );
+
         Order savedOrder = orderRepository.save(order);
 
         OrderResponseDto orderResponseDto = new OrderResponseDto(savedOrder.getId());
@@ -72,20 +70,18 @@ public class OrderService {
     // 주문 상태 조회 (유저)
     public ApiResponse<OrderUserResponseDto> checkOrder(AuthMember authMember, long orderId) {
 
-        Member member = memberRepository.findById(authMember.getId())
-                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
-
-        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(!member.getUserRole().equals(UserRole.USER)){
+        // 유저 전용 api
+        if(authMember.getRole().equals(UserRole.OWNER)){
             throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-        if(!Objects.equals(order.getMember().getId(), member.getId())) {
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
-        }
+        order.isOrderer(member);
 
         OrderUserResponseDto orderUserResponseDto = new OrderUserResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_CHECK_SUCCESS,orderUserResponseDto);
@@ -95,21 +91,26 @@ public class OrderService {
     @Transactional
     public ApiResponse<OrderOwnerResponseDto> acceptOrder(AuthMember authMember, long orderId) {
 
+        // OWNER 전용 api
+        if(authMember.getRole().equals(UserRole.USER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
+        }
+
         Member member = memberRepository.findById(authMember.getId())
                 .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
-        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(!member.getUserRole().equals(UserRole.OWNER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
-        }
+        // 주문 찾기
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-        Order order =checkOrderStatus(orderId);
+        // 주문 상태가 최초가 아니면 예외
+        order.isStatusDifferent(OrderStatusEnum.REQUEST);
 
-        //주인 맞는지 체크 해야함
-        checkOwnerOfStore(order, member);
+        // 주인 체크
+        order.getStore().isOwner(member);
+
         order.changeStatus(OrderStatusEnum.ACCEPTED);
         orderRepository.save(order);
-
 
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_ACCEPT_SUCCESS,orderOwnerResponseDto);
@@ -119,17 +120,24 @@ public class OrderService {
     @Transactional
     public ApiResponse<OrderOwnerResponseDto> rejectOrder(AuthMember authMember,long orderId) {
 
+        // OWNER 전용 api
+        if(authMember.getRole().equals(UserRole.USER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
+        }
+
         Member member = memberRepository.findById(authMember.getId())
                 .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
-        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(!member.getUserRole().equals(UserRole.OWNER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
-        }
+        // 주문 찾기
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-        Order order =checkOrderStatus(orderId);
-        //주인 맞는지 체크 해야함
-        checkOwnerOfStore(order, member);
+        // 주문 상태가 최초가 아니면 예외
+        order.isStatusDifferent(OrderStatusEnum.REQUEST);
+
+        // 주인 체크
+        order.getStore().isOwner(member);
+
         order.changeStatus(OrderStatusEnum.REJECTED);
         orderRepository.save(order);
 
@@ -141,54 +149,28 @@ public class OrderService {
     @Transactional
     public ApiResponse<OrderOwnerResponseDto> proceedOrder(AuthMember authMember, long orderId) {
 
+        // OWNER 전용 api
+        if(authMember.getRole().equals(UserRole.USER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
+        }
+
         Member member = memberRepository.findById(authMember.getId())
                 .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
-
-        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(!member.getUserRole().equals(UserRole.OWNER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
-        }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-        checkOwnerOfStore(order, member);
+        // 주인 체크
+        order.getStore().isOwner(member);
 
-        if(order.getStatus()==OrderStatusEnum.DELIVERED){
-            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_COMPLETE);
-        }
-        if(order.getStatus()==OrderStatusEnum.REJECTED){
-            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_REJECT);
-        }
+        // 불가능 상태 체크
+        order.isStatusSame(OrderStatusEnum.DELIVERED);
+        order.isStatusSame(OrderStatusEnum.REJECTED);
 
         order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()+1]);
         orderRepository.save(order);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_PROCEED_SUCCESS,orderOwnerResponseDto);
-    }
-
-    private Order checkOrderStatus(long orderId){
-
-        // 주문 찾기
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
-
-
-        // 주문 상태가 최초가 아니면 예외
-        if(!order.getStatus().getProcess().equals(OrderStatusEnum.REQUEST.getProcess())){
-            throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_IN_PROGRESS);
-        }
-
-        return order;
-    }
-
-
-    private void checkOwnerOfStore(Order order, Member member) {
-        Store store = order.getStore();
-
-        if (!member.equals(store.getMember())) {
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
-        }
     }
 }
 

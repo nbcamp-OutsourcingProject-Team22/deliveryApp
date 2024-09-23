@@ -21,21 +21,21 @@ public class OrderOwnerController {
     @PutMapping("/{orderId}/accept")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> acceptOrder(@Auth AuthMember member, @PathVariable long orderId){
         ApiResponse<OrderOwnerResponseDto> response = orderService.acceptOrder(member, orderId);
-        return ApiResponse.of(response, response.getData());
+        return ApiResponse.of(response);
     }
 
     @TrackOrder
     @PutMapping("/{orderId}/reject")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> rejectOrder(@Auth AuthMember member,@PathVariable long orderId){
         ApiResponse<OrderOwnerResponseDto> response = orderService.rejectOrder(member, orderId);
-        return ApiResponse.of(response, response.getData());
+        return ApiResponse.of(response);
     }
 
     @TrackOrder
     @PutMapping("/{orderId}/next")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> proceedOrder(@Auth AuthMember member,@PathVariable long orderId){
         ApiResponse<OrderOwnerResponseDto> response = orderService.proceedOrder(member, orderId);
-        return ApiResponse.of(response, response.getData());
+        return ApiResponse.of(response);
     }
 
 }
