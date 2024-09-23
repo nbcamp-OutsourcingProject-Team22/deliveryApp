@@ -1,6 +1,6 @@
 package com.sparta.deliveryapp.filter;
 
-import com.sparta.deliveryapp.jwt.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +9,12 @@ import org.springframework.context.annotation.Configuration;
 public class FilterConfig {
 
     @Bean
-    public FilterRegistrationBean<JwtAuthenticationFilter> JwtAuthenticationFilter() {
+    public FilterRegistrationBean<JwtAuthenticationFilter> JwtAuthenticationFilter(@Autowired JwtAuthenticationFilter jwtAuthenticationFilter) {
         FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
-        JwtUtil jwtUtil = new JwtUtil();
-        registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil));
-        registrationBean.addUrlPatterns("/menu/*", "/order/*", "/store/*"); // 필터가 적용될 URL 패턴 설정
+
+        registrationBean.setFilter(jwtAuthenticationFilter);
+        registrationBean.addUrlPatterns("/menu/*", "/order/*", "/store/*", "/members/secession"); // 필터가 적용될 URL 패턴 설정
+
         return registrationBean;
     }
 

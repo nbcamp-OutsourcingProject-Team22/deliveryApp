@@ -4,11 +4,13 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.config.PasswordEncoder;
 import com.sparta.deliveryapp.config.PasswordUtils;
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.dto.request.SecessionRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
-import com.sparta.deliveryapp.domain.member.UserRole;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
-import com.sparta.deliveryapp.entity.Members;
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.exception.InvalidRequestException;
 import com.sparta.deliveryapp.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,8 +29,8 @@ public class MemberService {
 
 
     public ApiResponse<Void> signup(SignupRequestDto request) {
-        Optional<Members> userByEmail = memberRepository.findByEmail(request.getEmail());
-        Optional<Members> userByNickname = memberRepository.findByUsername(request.getUsername());
+        Optional<Member> userByEmail = memberRepository.findByEmail(request.getEmail());
+        Optional<Member> userByNickname = memberRepository.findByUsername(request.getUsername());
 
         if (userByEmail.isPresent()) {
             throw new InvalidRequestException(ApiResponseMemberEnum.USERNAME_EMAIL_CHECK);
@@ -47,7 +49,7 @@ public class MemberService {
         UserRole userRole = UserRole.OWNER;
 
 
-        Members newMember = new Members(
+        Member newMember = new Member(
                 request.getEmail(),
                 request.getUsername(),
                 encodedPassword,
@@ -60,8 +62,8 @@ public class MemberService {
     }
 
     public ApiResponse<Void> userSignup(SignupRequestDto request) {
-        Optional<Members> userByEmail = memberRepository.findByEmail(request.getEmail());
-        Optional<Members> userByNickname = memberRepository.findByUsername(request.getUsername());
+        Optional<Member> userByEmail = memberRepository.findByEmail(request.getEmail());
+        Optional<Member> userByNickname = memberRepository.findByUsername(request.getUsername());
 
         if (userByEmail.isPresent()) {
             throw new InvalidRequestException(ApiResponseMemberEnum.USERNAME_EMAIL_CHECK);
@@ -80,7 +82,7 @@ public class MemberService {
         UserRole userRole = UserRole.USER;
 
 
-        Members newMember = new Members(
+        Member newMember = new Member(
                 request.getEmail(),
                 request.getUsername(),
                 encodedPassword,
@@ -93,7 +95,7 @@ public class MemberService {
 
     public String signIn(SignInRequestDto requestDto, HttpServletResponse response) {
         //email 조회
-        Members member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         //비밀번호 일치 확인
         if (!passwordEncoder.matches(requestDto.getPassword(),member.getPassword() )){
@@ -102,5 +104,22 @@ public class MemberService {
         String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole(), member.isActive(), member.isSecession());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
         return token;
+    }
+
+    public ApiResponse<Void> secession(AuthMember authMember, SecessionRequestDto requestDto){
+
+        //멤버 확인
+        Member member = memberRepository.findById(authMember.getId()).orElseThrow(() ->
+                new NullPointerException("잘못된 정보입니다."));
+
+
+        //비밀번호 확인
+        if (!PasswordUtils.isValidPassword(requestDto.getPassword())) {
+            throw new InvalidRequestException(ApiResponseMemberEnum.PASSWORD_CHECK);
+        }
+
+        member.isActive();
+
+        return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SECESSION);
     }
 }
