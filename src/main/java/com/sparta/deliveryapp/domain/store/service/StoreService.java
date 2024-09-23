@@ -34,11 +34,10 @@ public class StoreService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public ApiResponse<Void> createStore(Long memberId,StoreRequestDto requestDto) {
-        // TODO: 여기 바꿔야함
-        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+    public ApiResponse<Void> createStore(Long memberId, StoreRequestDto requestDto) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new HandleNotFound(ApiResponseMemberEnum.MEMBER_NOT_FOUND));
 
-        if (member.getUserRole().equals(UserRole.USER) ) {
+        if (member.getUserRole().equals(UserRole.USER)) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
         }
         int storeCount = getStoreCount(member);
@@ -52,21 +51,20 @@ public class StoreService {
     }
 
     @Transactional
-    public ApiResponse<Void> updateStore(Long memberId,Long storeId, StoreRequestDto storeRequestDto) {
-        // TODO: 여기 바꿔야함
-        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+    public ApiResponse<Void> updateStore(Long memberId, Long storeId, StoreRequestDto storeRequestDto) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new HandleNotFound(ApiResponseMemberEnum.MEMBER_NOT_FOUND));
 
-        if (member.getUserRole().equals(UserRole.USER) ) {
+        if (member.getUserRole().equals(UserRole.USER)) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
         }
         Store store = findByStoreId(storeId);
         store.isOwner(member);
         Store updateStore = Store.builder()
                 .id(store.getId())
-                .storeName(Objects.isNull(storeRequestDto.getStoreName()) ? store.getStoreName() : storeRequestDto.getStoreName() )
-                .openingTime(Objects.isNull(storeRequestDto.getOpeningTime()) ? store.getOpeningTime() : storeRequestDto.getOpeningTime() )
-                .closingTime(Objects.isNull(storeRequestDto.getClosingTime()) ? store.getClosingTime() : storeRequestDto.getClosingTime() )
-                .minOrderAmount(Objects.isNull(storeRequestDto.getMinOrderAmount()) ? store.getMinOrderAmount() : storeRequestDto.getMinOrderAmount() )
+                .storeName(Objects.isNull(storeRequestDto.getStoreName()) ? store.getStoreName() : storeRequestDto.getStoreName())
+                .openingTime(Objects.isNull(storeRequestDto.getOpeningTime()) ? store.getOpeningTime() : storeRequestDto.getOpeningTime())
+                .closingTime(Objects.isNull(storeRequestDto.getClosingTime()) ? store.getClosingTime() : storeRequestDto.getClosingTime())
+                .minOrderAmount(Objects.isNull(storeRequestDto.getMinOrderAmount()) ? store.getMinOrderAmount() : storeRequestDto.getMinOrderAmount())
                 .isClose(false)
                 .build();
         storeRepository.save(updateStore);
@@ -74,7 +72,8 @@ public class StoreService {
     }
 
     /**
-     *  단건 가게 반환 (철자 정확히 일치해야함)
+     * 단건 가게 반환 (철자 정확히 일치해야함)
+     *
      * @param storeName 찾고자 하는 가게
      * @return 조회된 가게 반환 (메뉴 있으면 메뉴 포함하여 반환)
      */
@@ -82,24 +81,16 @@ public class StoreService {
     public ApiResponse<StoreResponseDto> getStore(String storeName) {
         Store store = findByStoreName(storeName);
         store.isClosed();
-        Menu menu = menuRepository.findByStore(store).orElse(null);
-        StoreResponseDto storeResponseDto;
-        if (menu == null) {
-            // 메뉴가 없다면 menu는 null로 처리하기위하여, store만 넣어줌
-            storeResponseDto = StoreResponseDto.of(store);
-        } else {
-            // 메뉴가 있다면 메뉴 넣어서 처리
-            storeResponseDto = StoreResponseDto.of(store,menu);
-        }
-
-        return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storeResponseDto);
+        List<Menu> menu = menuRepository.findAllByStore(store);
+        StoreResponseDto storeResponseDto = StoreResponseDto.of(store, menu);
+        return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storeResponseDto);
     }
 
     /**
      * 클라이언트로부터 들어온 문자열과, 일부 일치하는 가게 전부 반환 메서드
      *
      * @param storeName 조회할 가게 이름
-     * @param pageable 페이지 정보 (page,size,sort)
+     * @param pageable  페이지 정보 (page,size,sort)
      * @return 조회된 가게들 반환
      */
     @Transactional
@@ -107,16 +98,17 @@ public class StoreService {
         if (Strings.isBlank(storeName)) {
             Page<Store> page = findAllStorePage(pageable);
             List<StoresResponseDto> storesResponse = page.map(StoresResponseDto::of).toList();
-            return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storesResponse);
+            return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storesResponse);
         } else {
-            Page<Store> page = findAllByStoreNameAndPage(storeName,pageable);
+            Page<Store> page = findAllByStoreNameAndPage(storeName, pageable);
             List<StoresResponseDto> storesResponse = page.map(StoresResponseDto::of).toList();
-            return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS,storesResponse);
+            return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storesResponse);
         }
     }
 
     /**
      * 가게 폐업 메서드
+     *
      * @param storeId 폐업할 가게
      * @return 폐업 성공 내용 반환
      */
@@ -124,8 +116,8 @@ public class StoreService {
     public ApiResponse<Void> closeStore(Long memberId, Long storeId) {
         Store store = findByStoreId(storeId);
         // TODO: 여기 바꿔야함
-        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
-        if (member.getUserRole().equals(UserRole.USER) ) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new HandleNotFound(ApiResponseMemberEnum.MEMBER_NOT_FOUND));
+        if (member.getUserRole().equals(UserRole.USER)) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
         }
         store.isOwner(member);
@@ -157,18 +149,20 @@ public class StoreService {
     }
 
     /**
-     *  storeName이 포함되는 가게 전부 찾기,false인것들만 반환함, 없으면 빈 List 반환
+     * storeName이 포함되는 가게 전부 찾기,false인것들만 반환함, 없으면 빈 List 반환
+     *
      * @param storeName 찾을 가게명
-     * @param pageable 조회 하고자 하는 페이지 정보
+     * @param pageable  조회 하고자 하는 페이지 정보
      * @return 가게명이 포함되는 가게 전부 반환 (자음 + 모음 합친것만 가능)
      */
     @Transactional(readOnly = true)
     public Page<Store> findAllByStoreNameAndPage(String storeName, Pageable pageable) {
-        return storeRepository.findAllByStoreNameContainingAndIsCloseFalse(storeName,pageable);
+        return storeRepository.findAllByStoreNameContainingAndIsCloseFalse(storeName, pageable);
     }
 
     /**
      * storeName이 공백일때는 모든 가게를 반환하는데, close 여부가 false인것들만 반환함
+     *
      * @param pageable 조회 하고자 하는 페이지 정보
      * @return 모든 가게 반환
      */
