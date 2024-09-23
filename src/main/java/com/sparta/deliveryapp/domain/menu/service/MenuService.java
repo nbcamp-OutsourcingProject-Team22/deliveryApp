@@ -66,6 +66,23 @@ public class MenuService {
         return new ApiResponse<> (ApiResponseMenuEnum.MENU_UPDATE_SUCCESS, new MenuResponse(savedMenu));
     }
 
+    // 메뉴 삭제
+    @Transactional
+    public ApiResponse<Void> deleteMenu(AuthMember authMember, Long storeId, Long menuId) {
+
+        Member member = validateMember(authMember);
+
+        validateStore(storeId, member);
+
+        Menu menu = validateMenu(menuId, storeId);
+
+        // 메뉴 삭제 상태로 변경
+        menu.markAsDeleted();
+        menuRepository.save(menu);
+
+        return new ApiResponse<>(ApiResponseMenuEnum.MENU_DELETE_SUCCESS);
+    }
+
     // 멤버 확인 메서드
     private Member validateMember (AuthMember authMember){
         Member member = memberRepository.findById(authMember.getId())

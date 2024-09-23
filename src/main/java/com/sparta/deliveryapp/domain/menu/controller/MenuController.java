@@ -39,4 +39,15 @@ public class MenuController {
         ApiResponse<MenuResponse> result = menuService.updateMenu(authMember, storeId, menuId, menuRequest);
         return ApiResponse.of(result, result.getData());
     }
+
+    // 메뉴 삭제
+    @DeleteMapping("/{menuId}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenu(
+            @Auth AuthMember authMember,
+            @PathVariable Long storeId,
+            @PathVariable Long menuId
+    ) {
+        ApiResponse<Void> result = menuService.deleteMenu(authMember, storeId, menuId);
+        return ApiResponse.of(result);
+    }
 }

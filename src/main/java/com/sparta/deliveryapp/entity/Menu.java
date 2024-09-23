@@ -48,4 +48,8 @@ public class Menu {
         this.menuPrice = menuPrice;
         this.menuDescription = menuDescription;
     }
+
+    public void markAsDeleted() {
+        this.isDeleted = true; // 메뉴를 삭제 상태로 변경
+    }
 }
