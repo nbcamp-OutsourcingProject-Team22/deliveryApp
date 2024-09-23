@@ -45,7 +45,8 @@ public class Store extends Timestamped {
                 requestDto.getOpeningTime(),
                 requestDto.getClosingTime(),
                 requestDto.getMinOrderAmount(),
-                false
+                false,
+                null
         );
     }
 
@@ -64,14 +65,15 @@ public class Store extends Timestamped {
     /**
      *  멤버와 1:N 관계
      */
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "members_id")
+    private Members member;
 
     /**
      *  멤버 연관관게 설정
      */
-//    public void addMember(Member member) {
-//        this.member = member;
-//    }
+    public void addMember(Members member) {
+        this.member = member;
+    }
 
 }

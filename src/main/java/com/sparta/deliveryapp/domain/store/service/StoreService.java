@@ -1,15 +1,21 @@
 package com.sparta.deliveryapp.domain.store.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
+import com.sparta.deliveryapp.entity.Members;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
+import com.sparta.deliveryapp.exception.HandleMaxException;
 import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Page;
@@ -25,24 +31,23 @@ import java.util.Objects;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
-//    private final MemberRepository memberRepository;
-//    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     // TODO: 멤버 연관관계 추가해야함
     @Transactional
-    public ApiResponse<Void> createStore(
-            // memberId,
-            StoreRequestDto requestDto
-    ) {
-//        Member member =  memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(...) );
-//        if (member.role.equals(UserRole.USER) ) {
-//            throw new HandleUnauthorized(ApiResponseStoreEnum.NOT_OWNER)
-//        }
-//        int storeCount = getStoreCount(memberId);
-//        if (storeCount >= 3) {
-//            throw new HandleMaxException(ApiResponseStoreEnum.STORE_MAX);
-//        }
+    public ApiResponse<Void> createStore(Integer memberId,StoreRequestDto requestDto) {
+        // 여기 바꿔야함
+        Members member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+
+        if (member.getUserRole().equals(UserRole.USER) ) {
+            throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
+        }
+        int storeCount = getStoreCount(member);
+        if (storeCount >= 3) {
+            throw new HandleMaxException(ApiResponseStoreEnum.STORE_MAX);
+        }
         Store store = Store.of(requestDto);
+        store.addMember(member);
         storeRepository.save(store);
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_SAVE_SUCCESS);
     }
@@ -161,18 +166,15 @@ public class StoreService {
         return storeRepository.findAllByIsCloseFalse(pageable);
     }
 
-
-
-
     /**
-     * 사장 id로 가게 몇개 개설했는지 찾는 메서드
+     * 사장 id로 가게 몇개 개설했는지, 정상 운영중인 가게들만 가져옴
      *
-     * @param memberId 가게 갯수 셀 사장의 id
+     * @param member 가게 갯수 셀 사장
      * @return 조회된 가게들 갯수 반환
      */
-//    @Transactional(readOnly = true)
-//    public Integer getStoreCount(Long memberId) {
-//        List<Store> stores = storeRepository.findALlByMemberId(memberId);
-//        return stores.size();
-//    }
+    @Transactional(readOnly = true)
+    public Integer getStoreCount(Members member) {
+        List<Store> stores = storeRepository.findAllByMemberAndIsCloseFalse(member);
+        return stores.size();
+    }
 }

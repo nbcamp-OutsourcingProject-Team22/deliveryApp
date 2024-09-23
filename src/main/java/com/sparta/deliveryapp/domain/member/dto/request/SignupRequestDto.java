@@ -1,5 +1,4 @@
-package com.sparta.deliveryapp.domain.dto.request;
-
+package com.sparta.deliveryapp.domain.member.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,11 +9,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignInRequestDto {
+public class SignupRequestDto {
 
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    private String username;
 
     @NotBlank
     private String password;
