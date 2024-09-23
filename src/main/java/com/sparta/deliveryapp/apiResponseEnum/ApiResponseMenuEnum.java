@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ApiResponseMenuEnum implements ApiResponseEnumImpl {
     // 200
     MENU_SAVE_SUCCESS(HttpStatus.OK, "메뉴 저장에 성공하였습니다."),
+    MENU_UPDATE_SUCCESS(HttpStatus.OK, "메뉴 수정에 성공하였습니다."),
 
     // 400
     MENU_MAX(HttpStatus.BAD_REQUEST,"입력된 정보가 틀렸습니다."),
