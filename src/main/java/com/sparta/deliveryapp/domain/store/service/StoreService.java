@@ -35,7 +35,7 @@ public class StoreService {
 
     @Transactional
     public ApiResponse<Void> createStore(Long memberId,StoreRequestDto requestDto) {
-        // 여기 바꿔야함
+        // TODO: 여기 바꿔야함
         Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
 
         if (member.getUserRole().equals(UserRole.USER) ) {
@@ -121,8 +121,14 @@ public class StoreService {
      * @return 폐업 성공 내용 반환
      */
     @Transactional
-    public ApiResponse<Void> closeStore(Long storeId) {
+    public ApiResponse<Void> closeStore(Long memberId, Long storeId) {
         Store store = findByStoreId(storeId);
+        // TODO: 여기 바꿔야함
+        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+        if (member.getUserRole().equals(UserRole.USER) ) {
+            throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
+        }
+        store.isOwner(member);
         // 폐업 전환
         store.closed();
         return new ApiResponse<>(ApiResponseStoreEnum.STORE_CLOSE_SUCCESS);

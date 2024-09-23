@@ -85,8 +85,12 @@ public class StoreController {
      * @return 폐업성공 메세지
      */
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> closeStore(@PathVariable Long storeId) {
-        ApiResponse<Void> result = storeService.closeStore(storeId);
+    public ResponseEntity<ApiResponse<Void>> closeStore(
+            @Auth AuthMember authMember,
+            @PathVariable Long storeId
+    ) {
+        Long memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.closeStore(memberId,storeId);
         return ApiResponse.of(result);
     }
 }
