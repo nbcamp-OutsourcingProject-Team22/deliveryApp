@@ -6,6 +6,8 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMemberEnum;
 import com.sparta.deliveryapp.config.PasswordEncoder;
 import com.sparta.deliveryapp.config.PasswordUtils;
 import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.dto.request.SecessionRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
@@ -56,8 +58,8 @@ public class MemberService {
         );
 
 
-       memberRepository.save(newMember);
-       return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
+        memberRepository.save(newMember);
+        return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
     }
 
     public ApiResponse<Void> userSignup(SignupRequestDto request) {
@@ -103,5 +105,23 @@ public class MemberService {
         String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole(), member.isActive(), member.isSecession());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
         return token;
+    }
+
+    public ApiResponse<Void> secession(AuthMember authMember, SecessionRequestDto requestDto){
+
+        //멤버 확인
+        Member member = memberRepository.findById(authMember.getId()).orElseThrow(() ->
+                new NullPointerException("잘못된 정보입니다."));
+
+
+        //비밀번호 확인
+        if (!PasswordUtils.isValidPassword(requestDto.getPassword())) {
+            throw new InvalidRequestException(ApiResponseMemberEnum.PASSWORD_CHECK);
+        }
+
+        member.changeSecession();
+        memberRepository.save(member);
+
+        return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SECESSION);
     }
 }
