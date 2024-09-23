@@ -1,7 +1,9 @@
 package com.sparta.deliveryapp.domain.member.controller;
 
-import com.sparta.deliveryapp.annotation.TrackOrder;
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.dto.request.SecessionRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.service.MemberService;
@@ -39,5 +41,11 @@ public class MemberController {
         //header 저장
         response.setHeader("Authorization", token);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/secession")
+    public ResponseEntity<ApiResponse<Void>> secession(@Auth AuthMember authMember, SecessionRequestDto requestDto) {
+        ApiResponse<Void> result = memberService.secession(authMember, requestDto);
+        return ApiResponse.of(result);
     }
 }

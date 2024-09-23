@@ -1,5 +1,6 @@
 package com.sparta.deliveryapp.entity;
 
+
 import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import jakarta.persistence.*;
