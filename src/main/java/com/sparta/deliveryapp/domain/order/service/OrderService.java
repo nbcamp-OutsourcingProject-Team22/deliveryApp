@@ -1,7 +1,9 @@
 package com.sparta.deliveryapp.domain.order.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseMenuEnum;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseOrderEnum;
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
@@ -48,10 +50,10 @@ public class OrderService {
         }
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
-                .orElseThrow(() ->  new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND));
+                .orElseThrow(() ->  new HandleNotFound(ApiResponseStoreEnum.STORE_NOT_FOUND));
 
         Menu menu = menuRepository.findById(orderRequestDto.getMenuId())
-                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MENU_NOT_FOUND));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseMenuEnum.MENU_NOT_FOUND));
 
 
         Order order = new Order(

@@ -40,7 +40,6 @@ public class AspectModule {
         Long orderId = null;
         Long storeId = null;
 
-
         if (methodName.equals("requestOrder")) {
             OrderRequestDto orderRequestDto = (OrderRequestDto) args[1]; // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
             storeId = orderRequestDto.getStoreId();
@@ -66,6 +65,7 @@ public class AspectModule {
                 ApiResponse<OrderResponseDto> orderResponseDto = responseEntity.getBody();
                 log.info("::: 주문 Id : {} :::", orderResponseDto.getData().getOrderId());
             } else if(methodName.equals("checkOrder")) {
+
                 ResponseEntity<ApiResponse<OrderUserResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderUserResponseDto>>) result;
                 ApiResponse<OrderUserResponseDto> orderUserResponseDto = responseEntity.getBody();
                 log.info("::: 가게 Id : {} :::",orderUserResponseDto.getData().getStoreId() );
