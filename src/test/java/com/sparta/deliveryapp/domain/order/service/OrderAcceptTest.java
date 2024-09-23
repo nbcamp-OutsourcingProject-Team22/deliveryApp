@@ -69,8 +69,8 @@ public class OrderAcceptTest {
     @Test
     void 요청_수락(){
         // given
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(store.getMember()).willReturn(member);
         // when
@@ -127,7 +127,7 @@ public class OrderAcceptTest {
         assertEquals("진행중인 주문입니다.",exception.getApiResponseEnum().getMessage());
     }
     @Test
-    void 수락_주인_아님(){
+    void 수락_주인_권한_아님(){
 
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(member.getUserRole()).willReturn(UserRole.USER);
@@ -140,7 +140,7 @@ public class OrderAcceptTest {
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
     }
     @Test
-    void 거절_주인_아님(){
+    void 거절_주인_권한_아님(){
 
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(member.getUserRole()).willReturn(UserRole.USER);
@@ -152,14 +152,25 @@ public class OrderAcceptTest {
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
     }
-//    @Test
-//    void 주문_없음() {
-//        // given
-//        given(orderRepository.findById(1L)).willReturn(Optional.empty());
-//
-//        // when & then
-//        assertThatThrownBy(() -> orderService.acceptOrder(member,1L))
-//                .isInstanceOf(EntityNotFoundException.class)
-//                .hasMessage("주문을 찾을 수 없습니다.");
-//    }
+    @Test
+    void 가게_주인_아님(){
+
+
+        Member newMember = mock(Member.class);
+        ReflectionTestUtils.setField(newMember, "id", 2L);
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+        given(store.getMember()).willReturn(newMember);
+
+
+        // when
+        HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class,
+                ()->orderService.acceptOrder(authMember,1L));
+
+
+        // then
+        assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
+    }
 }

@@ -170,20 +170,9 @@ public class OrderService {
     private void checkOwnerOfStore(Order order, Member member) {
         Store store = order.getStore();
 
-        // Null 검사 추가
-        if (store == null ) {
-            throw new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND);
-        }
-        if (member == null) {
-            throw new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND);
-        }
         if (!member.equals(store.getMember())) {
             throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
         }
     }
-
-
-
-
 }
 
