@@ -40,7 +40,7 @@ public class OrderService {
     public ApiResponse<OrderResponseDto> requestOrder(AuthMember authMember, OrderRequestDto orderRequestDto) {
 
         Member member = memberRepository.findById(authMember.getId())
-                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
         if(!member.getUserRole().equals(UserRole.USER)){
@@ -98,7 +98,7 @@ public class OrderService {
         Order order =checkOrderStatus(orderId);
 
         //주인 맞는지 체크 해야함
-//        checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
 
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
@@ -118,7 +118,7 @@ public class OrderService {
 
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
-//        checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return new ApiResponse<>(ApiResponseOrderEnum.ORDER_REJECT_SUCCESS,orderOwnerResponseDto);
@@ -138,7 +138,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-//        checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
 
         if(order.getStatus()==OrderStatusEnum.DELIVERED){
             throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_COMPLETE);
@@ -175,7 +175,7 @@ public class OrderService {
             throw new IllegalArgumentException("가게 또는 멤버 정보가 누락되었습니다.");
         }
 
-        if (!store.getMember().equals(member)) {
+        if (!member.equals(store.getMember())) {
             throw new IllegalArgumentException("해당 가게의 주인이 아닙니다.");
         }
     }

@@ -1,8 +1,12 @@
 package com.sparta.deliveryapp.domain.order.service;
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
@@ -21,6 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -33,10 +38,13 @@ public class OrderAcceptTest {
     private MenuRepository menuRepository;
     @Mock
     private OrderRepository orderRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private OrderService orderService;
 
+    private AuthMember authMember;
     private Member member;
     private Store store;
     private Menu menu;
@@ -44,8 +52,11 @@ public class OrderAcceptTest {
 
     @BeforeEach
     void setUp(){
+        authMember = mock(AuthMember.class);
+        ReflectionTestUtils.setField(authMember,"id",1L);
         member = mock(Member.class);
         ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "userRole", UserRole.OWNER);
         store = mock(Store.class);
         ReflectionTestUtils.setField(store, "id", 1L);
         menu = mock(Menu.class);
@@ -57,10 +68,12 @@ public class OrderAcceptTest {
     @Test
     void 요청_수락(){
         // given
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
-
+        given(store.getMember()).willReturn(member);
         // when
-        orderService.acceptOrder(member,1L);
+        orderService.acceptOrder(authMember,1L);
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.ACCEPTED);
@@ -68,10 +81,12 @@ public class OrderAcceptTest {
     @Test
     void 요청_거절(){
         // given
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
-
+        given(store.getMember()).willReturn(member);
         // when
-        orderService.rejectOrder(member,1L);
+        orderService.rejectOrder(authMember,1L);
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.REJECTED);
@@ -79,12 +94,17 @@ public class OrderAcceptTest {
     @Test
     void 이미_진행된_주문() {
         // given
-        order.changeStatus(OrderStatusEnum.ACCEPTED);
+
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+        given(store.getMember()).willReturn(member);
+        order.changeStatus(OrderStatusEnum.ACCEPTED);
+
 
         // when
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
-            orderService.rejectOrder(member,1L);
+            orderService.rejectOrder(authMember,1L);
         });
 
         // then

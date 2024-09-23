@@ -1,11 +1,15 @@
 package com.sparta.deliveryapp.domain.order.service;
 
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
@@ -38,11 +42,14 @@ public class OrderServiceTest {
     private MenuRepository menuRepository;
     @Mock
     private OrderRepository orderRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private OrderService orderService;
 
 
+    private AuthMember authMember;
     private Member member;
     private Store store;
     private Menu menu;
@@ -50,8 +57,11 @@ public class OrderServiceTest {
 
     @BeforeEach
     void setUp(){
+        authMember = mock(AuthMember.class);
+        ReflectionTestUtils.setField(authMember,"id",1L);
         member = mock(Member.class);
         ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "userRole", UserRole.USER);
         store = mock(Store.class);
         ReflectionTestUtils.setField(store, "id", 1L);
         menu = mock(Menu.class);
@@ -65,13 +75,15 @@ public class OrderServiceTest {
         // given
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
 
+        given(member.getUserRole()).willReturn(UserRole.USER);
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(menuRepository.findById(anyLong())).willReturn(Optional.of(menu));
         given(orderRepository.save(any(Order.class))).willReturn(order);
 
 
         // when
-        String response = orderService.requestOrder(member, orderRequestDto).getMessage();
+        String response = orderService.requestOrder(authMember, orderRequestDto).getMessage();
 
         // then
         assertThat(response).isEqualTo("주문 저장에 성공하였습니다.");
@@ -83,11 +95,13 @@ public class OrderServiceTest {
         // given
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
 
+        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(storeRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then
         HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
-            orderService.requestOrder(member, orderRequestDto);
+            orderService.requestOrder(authMember, orderRequestDto);
         });
 
         assertEquals("가게를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -101,12 +115,14 @@ public class OrderServiceTest {
         Store store = mock(Store.class);
         ReflectionTestUtils.setField(store, "id", 1L);
 
+        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(storeRepository.findById(1L)).willReturn(Optional.of(store));
         given(menuRepository.findById(1L)).willReturn(Optional.empty());
 
         // when & then
         HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
-            orderService.requestOrder(member, orderRequestDto);
+            orderService.requestOrder(authMember, orderRequestDto);
         });
 
         assertEquals("메뉴를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());

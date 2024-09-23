@@ -8,12 +8,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="members")
+@Table(name="member")
 public class Member extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +26,19 @@ public class Member extends Timestamped {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    public Member(@NotBlank @Email String email, @NotBlank String username, String encodedPassword, UserRole userRole) {
+    @ColumnDefault("true")
+    private boolean isActive; //활동계정 default true
+
+    @ColumnDefault("false")
+    private boolean isSecession; //회원탈퇴 default false
+
+
+    public Member(
+            @NotBlank @Email String email,
+            @NotBlank String username,
+            String encodedPassword,
+            UserRole userRole
+            ){
         this.email = email;
         this.username = username;
         this.password = encodedPassword;

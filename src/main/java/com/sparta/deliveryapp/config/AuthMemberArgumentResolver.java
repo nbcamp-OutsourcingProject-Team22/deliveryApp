@@ -29,7 +29,7 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
         // JwtFilter 에서 set 한 userId, username, userRole 값을 가져옴
-        Integer id = (Integer) request.getAttribute("id");
+        Long id = (Long) request.getAttribute("id");
         String username = (String) request.getAttribute("username");
         String roleStr = (String) request.getAttribute("role");
         Boolean isActive = (Boolean) request.getAttribute("isActive");

@@ -67,12 +67,12 @@ public class Store extends Timestamped {
      */
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "members_id")
-    private Members member;
+    private Member member;
 
     /**
      *  멤버 연관관게 설정
      */
-    public void addMember(Members member) {
+    public void addMember(Member member) {
         this.member = member;
     }
 

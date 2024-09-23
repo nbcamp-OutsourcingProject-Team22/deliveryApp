@@ -11,7 +11,8 @@ import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.domain.store.service.StoreService;
-import com.sparta.deliveryapp.entity.Members;
+
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleMaxException;
@@ -87,10 +88,10 @@ class StoreServiceTest {
         @DisplayName("가게 생성 성공")
         void test1() {
             // given - 성공하였을때 메세지 준비, 연관관계 설정 멤버 추가
-            Integer memberId = 1;
+            Long memberId = 1L;
             Store store = Store.of(createStoreDto);
             List<Store> stores = List.of(store);
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -114,7 +115,7 @@ class StoreServiceTest {
         @DisplayName("가게 생성 실패 _ 유저 못 찾음")
         void test2() {
             // given - 성공하였을때 메세지 준비, 연관관계 설정 멤버 추가
-            Integer memberId = 1;
+            Long memberId = 1L;
             // 여기 메세지 바꿔야함
             String expectedExceptionMessage = "비밀번호를 확인해주세요.";
             given(memberRepository.findById(memberId)).willReturn(Optional.empty());
@@ -133,8 +134,8 @@ class StoreServiceTest {
         @DisplayName("가게 생성 실패 _ 사장 권한 아님")
         void test3() {
             // given - 성공하였을때 메세지 준비, 연관관계 설정 멤버 추가
-            Integer memberId = 1;
-            Members member = new Members(
+            Long memberId = 1L;
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -157,13 +158,13 @@ class StoreServiceTest {
         @DisplayName("가게 생성 실패 _ 가게 3개 까지 가능")
         void test4() {
             // given - 성공하였을때 메세지 준비, 연관관계 설정 멤버 추가
-            Integer memberId = 1;
+            Long memberId = 1L;
             Store store = Store.of(createStoreDto);
             Store store1 = Store.of(createStoreDto);
             Store store2 = Store.of(createStoreDto);
             Store store3 = Store.of(createStoreDto);
             List<Store> stores = List.of(store,store1,store2,store3);
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
