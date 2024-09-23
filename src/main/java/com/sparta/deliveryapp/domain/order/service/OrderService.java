@@ -44,7 +44,7 @@ public class OrderService {
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
         if(!member.getUserRole().equals(UserRole.USER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
@@ -70,14 +70,14 @@ public class OrderService {
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
         if(!member.getUserRole().equals(UserRole.USER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
         if(!Objects.equals(order.getMember().getId(), member.getId())) {
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         OrderUserResponseDto orderUserResponseDto = new OrderUserResponseDto(order.getStore().getId(), order.getStatus().getProcess());

@@ -198,8 +198,8 @@ class StoreServiceTest {
         @DisplayName("가게 수정 성공")
         void test1() {
             // given - 성공하였을때, 메시지 준비
-            Integer memberId = 1;
-            Members member = new Members(
+            Long memberId = 1L;
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -229,10 +229,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 가게 못찾음")
         void test2() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "가게를 찾을 수 없습니다";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -257,10 +257,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 유저 못찾음")
         void test3() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "비밀번호를 확인해주세요.";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -286,10 +286,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 사장 권한이 아님")
         void test4() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "사장 권한이 아닙니다";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -315,14 +315,14 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 본인이 만든 가게가 아님")
         void test5() {
             // given - 성공하였을때, 메시지 준비
-            Integer memberId = 1;
-            Members realMember = new Members(
+            Long memberId = 1L;
+            Member realMember = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
                     UserRole.OWNER
             );
-            Members otherMember = new Members(
+            Member otherMember = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
