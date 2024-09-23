@@ -1,6 +1,8 @@
 package com.sparta.deliveryapp.domain.store.controller;
 
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
@@ -24,11 +26,11 @@ public class StoreController {
     // TODO: 사용자 받아야함 @Auth 같은걸로
     @PostMapping
     public ResponseEntity<ApiResponse<Void>>  createStore(
-//            @Auth AuthUser authUser;
+            @Auth AuthMember authMember,
             @RequestBody @Valid StoreRequestDto storeRequestDto
     ) {
-//        Long memberId = authUser.getId();
-        ApiResponse<Void> result = storeService.createStore(storeRequestDto);
+        Integer memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.createStore(memberId,storeRequestDto);
         return ApiResponse.of(result);
     }
 

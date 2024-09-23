@@ -99,7 +99,7 @@ public class MemberService {
         if (!passwordEncoder.matches(requestDto.getPassword(),member.getPassword() )){
             throw new IllegalArgumentException("비밀번호를 확인해주세요");
         }
-        String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole());
+        String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole(), member.isActive(), member.isSecession());
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
         return token;
     }

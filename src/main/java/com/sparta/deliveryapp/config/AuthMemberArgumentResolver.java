@@ -32,9 +32,10 @@ public class AuthMemberArgumentResolver implements HandlerMethodArgumentResolver
         Integer id = (Integer) request.getAttribute("id");
         String username = (String) request.getAttribute("username");
         String roleStr = (String) request.getAttribute("role");
+        Boolean isActive = (Boolean) request.getAttribute("isActive");
+        Boolean isSecession = (Boolean) request.getAttribute("isSecession");
 
         UserRole role = UserRole.valueOf(roleStr);
-
-        return new AuthMember(id, username, role);
+        return new AuthMember(id, username, role, isActive, isSecession);
     }
 }
