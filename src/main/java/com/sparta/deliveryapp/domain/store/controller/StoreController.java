@@ -69,12 +69,12 @@ public class StoreController {
     @GetMapping("/query")
     public ResponseEntity<ApiResponse<List<StoresResponseDto>>> getStores(
             @RequestParam(required = false) String storeName,
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
             @RequestParam(required = false, defaultValue = "desc") String sort
     ) {
         Sort.Direction direction = Sort.Direction.fromString(sort);
-        Pageable pageable = PageRequest.of(page, size, direction,"createdAt");
+        Pageable pageable = PageRequest.of(page - 1, size, direction,"createdAt");
         ApiResponse<List<StoresResponseDto>> result = storeService.getStores(storeName,pageable);
         return ApiResponse.of(result);
     }

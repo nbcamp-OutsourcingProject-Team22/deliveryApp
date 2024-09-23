@@ -6,12 +6,14 @@ import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
 import com.sparta.deliveryapp.domain.member.UserRole;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
+import com.sparta.deliveryapp.domain.review.repository.ReviewRepository;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
+import com.sparta.deliveryapp.entity.Review;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleMaxException;
 import com.sparta.deliveryapp.exception.HandleNotFound;
@@ -32,6 +34,7 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ApiResponse<Void> createStore(Long memberId, StoreRequestDto requestDto) {
@@ -65,6 +68,7 @@ public class StoreServiceImpl implements StoreService {
                 .openingTime(Objects.isNull(storeRequestDto.getOpeningTime()) ? store.getOpeningTime() : storeRequestDto.getOpeningTime())
                 .closingTime(Objects.isNull(storeRequestDto.getClosingTime()) ? store.getClosingTime() : storeRequestDto.getClosingTime())
                 .minOrderAmount(Objects.isNull(storeRequestDto.getMinOrderAmount()) ? store.getMinOrderAmount() : storeRequestDto.getMinOrderAmount())
+                .member(member)
                 .isClose(false)
                 .build();
         storeRepository.save(updateStore);
@@ -82,7 +86,8 @@ public class StoreServiceImpl implements StoreService {
         Store store = findByStoreName(storeName);
         store.isClosed();
         List<Menu> menu = menuRepository.findAllByStore(store);
-        StoreResponseDto storeResponseDto = StoreResponseDto.of(store, menu);
+        List<Review> review = reviewRepository.findByStoreIdOrderByCreatedAtDesc(store.getId());
+        StoreResponseDto storeResponseDto = StoreResponseDto.of(store, menu, review);
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storeResponseDto);
     }
 
@@ -95,13 +100,15 @@ public class StoreServiceImpl implements StoreService {
      */
     @Transactional
     public ApiResponse<List<StoresResponseDto>> getStores(String storeName, Pageable pageable) {
+        Page<Store> page;
+        List<StoresResponseDto> storesResponse;
         if (Strings.isBlank(storeName)) {
-            Page<Store> page = findAllStorePage(pageable);
-            List<StoresResponseDto> storesResponse = page.map(StoresResponseDto::of).toList();
+            page = findAllStorePage(pageable);
+            storesResponse = page.map(StoresResponseDto::of).toList();
             return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storesResponse);
         } else {
-            Page<Store> page = findAllByStoreNameAndPage(storeName, pageable);
-            List<StoresResponseDto> storesResponse = page.map(StoresResponseDto::of).toList();
+            page = findAllByStoreNameAndPage(storeName, pageable);
+            storesResponse = page.map(StoresResponseDto::of).toList();
             return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_GET_SUCCESS, storesResponse);
         }
     }

@@ -1,7 +1,9 @@
 package com.sparta.deliveryapp.domain.store.model;
 
 import com.sparta.deliveryapp.domain.menu.dto.MenuResponse;
+import com.sparta.deliveryapp.domain.review.dto.ReviewResponseDto;
 import com.sparta.deliveryapp.entity.Menu;
+import com.sparta.deliveryapp.entity.Review;
 import com.sparta.deliveryapp.entity.Store;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +27,7 @@ public class StoreResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<MenuResponse> menu;
+    private List<ReviewResponseDto> review;
 
     public StoreResponseDto(Long id, String storeName, LocalTime openingTime, LocalTime closingTime, Integer minOrderAmount, boolean isClose, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -38,8 +41,9 @@ public class StoreResponseDto {
     }
 
     // Dto -> Entity menu 있음
-    public static StoreResponseDto of(Store store, List<Menu> menu) {
+    public static StoreResponseDto of(Store store, List<Menu> menu, List<Review> review) {
         List<MenuResponse> menuResponse = menu.stream().map(MenuResponse::new).toList();
+        List<ReviewResponseDto> reviewResponse = review.stream().map(ReviewResponseDto::from).toList();
         return new StoreResponseDto(
                 store.getId(),
                 store.getStoreName(),
@@ -49,7 +53,8 @@ public class StoreResponseDto {
                 store.getIsClose(),
                 store.getCreatedAt(),
                 store.getUpdatedAt(),
-                menuResponse
+                menuResponse,
+                reviewResponse
         );
     }
 
@@ -64,6 +69,7 @@ public class StoreResponseDto {
                 store.getIsClose(),
                 store.getCreatedAt(),
                 store.getUpdatedAt(),
+                null,
                 null
         );
     }
