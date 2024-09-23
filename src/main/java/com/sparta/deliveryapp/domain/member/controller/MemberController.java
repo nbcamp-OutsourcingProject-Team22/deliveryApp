@@ -1,12 +1,8 @@
 package com.sparta.deliveryapp.domain.member.controller;
 
-import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
-import com.sparta.deliveryapp.domain.member.UserRole;
-import com.sparta.deliveryapp.domain.member.dto.response.AuthInfoResponseDto;
 import com.sparta.deliveryapp.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
