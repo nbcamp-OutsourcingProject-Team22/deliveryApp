@@ -3,8 +3,6 @@ package com.sparta.deliveryapp.domain.review.dto;
 import com.sparta.deliveryapp.entity.Review;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 public class ReviewResponseDto {
 

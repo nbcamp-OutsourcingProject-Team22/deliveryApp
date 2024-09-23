@@ -1,11 +1,8 @@
 package com.sparta.deliveryapp.domain.review.controller;
 
 
-import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseReviewEnum;
-import com.sparta.deliveryapp.domain.member.dto.AuthMember;
-import com.sparta.deliveryapp.domain.review.dto.ReviewRatingResponseDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewRequestDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewResponseDto;
 import com.sparta.deliveryapp.domain.review.service.ReviewService;

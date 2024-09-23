@@ -31,7 +31,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
-    private final MemberRepository memberRepository;
+
 
     // 리뷰 생성
     @Transactional
@@ -94,8 +94,8 @@ public class ReviewService {
         return reviews.stream().map(ReviewResponseDto::from).collect(Collectors.toList());
     }
 
-    // 별점 별 리뷰 조회 및 dto 변환
-    private List<ReviewRatingResponseDto> ratingToDtoList(List<Review> reviews) {
-        return reviews.stream().map(ReviewRatingResponseDto::from).collect(Collectors.toList());
-    }
+//    // 별점 별 리뷰 조회 및 dto 변환
+//    private List<ReviewRatingResponseDto> ratingToDtoList(List<Review> reviews) {
+//        return reviews.stream().map(ReviewRatingResponseDto::from).collect(Collectors.toList());
+//    }
 }

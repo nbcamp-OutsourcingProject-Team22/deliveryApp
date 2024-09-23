@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "review")
 public class Review extends Timestamped {
 
-    private static ReviewRequestDto reviewRequestDto;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
