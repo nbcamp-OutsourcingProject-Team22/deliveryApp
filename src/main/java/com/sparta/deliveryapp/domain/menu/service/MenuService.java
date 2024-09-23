@@ -86,8 +86,7 @@ public class MenuService {
     // 멤버 확인 메서드
     private Member validateMember (AuthMember authMember){
         Member member = memberRepository.findById(authMember.getId())
-                // member not found 생기면 바꿔주기
-                .orElseThrow(() -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+                .orElseThrow(() -> new HandleNotFound(ApiResponseMemberEnum.MEMBER_NOT_FOUND));
         if (member.getUserRole() != UserRole.OWNER) {
             throw new HandleUnauthorizedException(ApiResponseMenuEnum.NOT_OWNER);
         }
