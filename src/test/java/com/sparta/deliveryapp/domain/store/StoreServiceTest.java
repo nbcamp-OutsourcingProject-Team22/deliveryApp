@@ -198,8 +198,8 @@ class StoreServiceTest {
         @DisplayName("가게 수정 성공")
         void test1() {
             // given - 성공하였을때, 메시지 준비
-            Integer memberId = 1;
-            Members member = new Members(
+            Long memberId = 1L;
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -229,10 +229,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 가게 못찾음")
         void test2() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "가게를 찾을 수 없습니다";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -257,10 +257,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 유저 못찾음")
         void test3() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "비밀번호를 확인해주세요.";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -286,10 +286,10 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 사장 권한이 아님")
         void test4() {
             // given - 실패하였을때, 메시지 준비
-            Integer memberId = 1;
+            Long memberId = 1L;
             Long storeId = 1L;
             String expectedExceptionMessage = "사장 권한이 아닙니다";
-            Members member = new Members(
+            Member member = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
@@ -315,21 +315,21 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 본인이 만든 가게가 아님")
         void test5() {
             // given - 성공하였을때, 메시지 준비
-            Integer memberId = 1;
-            Members realMember = new Members(
+            Long memberId = 1L;
+            Member realMember = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
                     UserRole.OWNER
             );
-            Members otherMember = new Members(
+            Member otherMember = new Member(
                     signupRequestDto.getEmail(),
                     signupRequestDto.getUsername(),
                     signupRequestDto.getPassword(),
                     UserRole.OWNER
             );
             ReflectionTestUtils.setField(realMember, "id", memberId);
-            ReflectionTestUtils.setField(otherMember, "id", 2);
+            ReflectionTestUtils.setField(otherMember, "id", 2L);
             Long storeId = 1L;
             String expectedExceptionMessage = "가게 주인이 아닙니다";
             Store expectedStore = Store.of(updateStoreDto);
@@ -485,14 +485,25 @@ class StoreServiceTest {
         @DisplayName("가게 폐업 성공")
         void test1() {
             // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long memberId = 1L;
+            Member member = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    signupRequestDto.getPassword(),
+                    UserRole.OWNER
+            );
+            ReflectionTestUtils.setField(member, "id", memberId);
             Long storeId = 1L;
             String expectedMessage = "가게 폐업에 성공 하였습니다";
             Store store = Store.of(createStoreDto);
             ReflectionTestUtils.setField(store, "id", storeId);
+            store.addMember(member);
             given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
 
             // when - 가게 폐업 시도
-            String actualMessage = storeService.closeStore(storeId).getMessage();
+            String actualMessage = storeService.closeStore(memberId,storeId).getMessage();
 
             // then - 예상한 메세지와 동일한지 확인
             assertEquals(
@@ -505,13 +516,112 @@ class StoreServiceTest {
         @DisplayName("가게 폐업 실패 _ 가게 못찾음")
         void test2() {
             // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long memberId = 1L;
+            Member member = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    signupRequestDto.getPassword(),
+                    UserRole.OWNER
+            );
+            ReflectionTestUtils.setField(member, "id", memberId);
             Long storeId = 1L;
             String expectedExceptionMessage = "가게를 찾을 수 없습니다";
             given(storeRepository.findById(storeId)).willReturn(Optional.empty());
 
             // when - 가게 폐업 시도
             HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
-                    storeService.closeStore(storeId)
+                    storeService.closeStore(memberId,storeId)
+            );
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedExceptionMessage,
+                    actualException.getApiResponseEnum().getMessage()
+            );
+        }
+        @Test
+        @DisplayName("가게 폐업 실패 _ 유저 못찾음")
+        void test3() {
+            // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long memberId = 1L;
+            Long storeId = 1L;
+            String expectedExceptionMessage = "비밀번호를 확인해주세요.";
+            Store store = Store.of(createStoreDto);
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+
+            // when - 가게 폐업 시도
+            HandleNotFound actualException = assertThrows(HandleNotFound.class, () ->
+                    storeService.closeStore(memberId,storeId)
+            );
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedExceptionMessage,
+                    actualException.getApiResponseEnum().getMessage()
+            );
+        }
+
+        @Test
+        @DisplayName("가게 폐업 실패 _ 사장 권한 아님")
+        void test4() {
+            // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long memberId = 1L;
+            Long storeId = 1L;
+            Member member = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    signupRequestDto.getPassword(),
+                    UserRole.USER
+            );
+            ReflectionTestUtils.setField(member, "id", memberId);
+            String expectedExceptionMessage = "사장 권한이 아닙니다";
+            Store store = Store.of(createStoreDto);
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+            // when - 가게 폐업 시도
+            HandleUnauthorizedException actualException = assertThrows(HandleUnauthorizedException.class, () ->
+                    storeService.closeStore(memberId,storeId)
+            );
+
+            // then - 예상한 메세지와 동일한지 확인
+            assertEquals(
+                    expectedExceptionMessage,
+                    actualException.getApiResponseEnum().getMessage()
+            );
+        }
+
+        @Test
+        @DisplayName("가게 폐업 실패 _ 본인이 만든 가게가 아님")
+        void test5() {
+            // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
+            Long memberId = 1L;
+            Long storeId = 1L;
+            Member realMember = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    signupRequestDto.getPassword(),
+                    UserRole.OWNER
+            );
+            Member otherMember = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    signupRequestDto.getPassword(),
+                    UserRole.OWNER
+            );
+            String expectedExceptionMessage = "가게 주인이 아닙니다";
+            Store store = Store.of(createStoreDto);
+            ReflectionTestUtils.setField(realMember, "id", memberId);
+            ReflectionTestUtils.setField(otherMember, "id", 2L);
+            ReflectionTestUtils.setField(store, "id", storeId);
+            store.addMember(realMember);
+            given(storeRepository.findById(storeId)).willReturn(Optional.of(store));
+            given(memberRepository.findById(memberId)).willReturn(Optional.of(otherMember));
+
+            // when - 가게 폐업 시도
+            HandleUnauthorizedException actualException = assertThrows(HandleUnauthorizedException.class, () ->
+                    storeService.closeStore(memberId,storeId)
             );
 
             // then - 예상한 메세지와 동일한지 확인
