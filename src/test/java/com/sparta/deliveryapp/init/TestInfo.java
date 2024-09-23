@@ -95,7 +95,8 @@ public class TestInfo {
                 TestMenuInfo.TEST_MENU_ONE.getMenuName(),
                 TestMenuInfo.TEST_MENU_ONE.getMenuPrice(),
                 TestMenuInfo.TEST_MENU_ONE.getMenuDescription(),
-                null
+                null,
+                false
         );
     }
     public static Menu getTwoMenu() {
@@ -104,7 +105,8 @@ public class TestInfo {
                 TestMenuInfo.TEST_MENU_TWO.getMenuName(),
                 TestMenuInfo.TEST_MENU_TWO.getMenuPrice(),
                 TestMenuInfo.TEST_MENU_TWO.getMenuDescription(),
-                null
+                null,
+                false
         );
     }
     public static Menu getThreeMenu() {
@@ -113,7 +115,8 @@ public class TestInfo {
                 TestMenuInfo.TEST_MENU_THREE.getMenuName(),
                 TestMenuInfo.TEST_MENU_THREE.getMenuPrice(),
                 TestMenuInfo.TEST_MENU_THREE.getMenuDescription(),
-                null
+                null,
+                false
         );
     }
 
