@@ -16,6 +16,7 @@ public enum ApiResponseStoreEnum implements ApiResponseEnumImpl {
 
     // 403
     NOT_OWNER(HttpStatus.FORBIDDEN.value(), "사장 권한이 아닙니다"),
+    STORE_NOT_OWNER(HttpStatus.FORBIDDEN.value(), "가게 주인이 아닙니다"),
 
     // 404
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "가게를 찾을 수 없습니다"),

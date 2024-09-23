@@ -5,6 +5,7 @@ import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.validator.StoreValid;
 import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,14 +56,6 @@ public class Store extends Timestamped {
     }
 
     /**
-     * 폐업 여부 확인
-     * @throws HandleNotFound 가게가 폐업 상태일때 발생되는 예외
-     */
-    public void isClosed() {
-        StoreValid.isCloseStore(this);
-    }
-
-    /**
      *  멤버와 1:N 관계
      */
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -76,4 +69,21 @@ public class Store extends Timestamped {
         this.member = member;
     }
 
+    /**
+     * 폐업 여부 확인
+     * @throws HandleNotFound 가게가 폐업 상태일때 발생되는 예외
+     */
+    public void isClosed() {
+        StoreValid.isCloseStore(this);
+    }
+
+    /**
+     * 가게의 사장인지 확인
+     * @param member 확인할 사장
+     * @throws HandleUnauthorizedException 가게의 사장이 아닐경우 발생되는 예외
+     */
+    public void isOwner(Members member) {
+        // 가게의 사장이 아니라면
+        StoreValid.isOwnerStore(this.member,member);
+    }
 }
