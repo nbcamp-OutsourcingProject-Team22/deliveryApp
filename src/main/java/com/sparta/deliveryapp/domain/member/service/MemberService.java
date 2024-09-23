@@ -58,8 +58,8 @@ public class MemberService {
         );
 
 
-       memberRepository.save(newMember);
-       return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
+        memberRepository.save(newMember);
+        return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SAVE_SUCCESS);
     }
 
     public ApiResponse<Void> userSignup(SignupRequestDto request) {
@@ -119,7 +119,8 @@ public class MemberService {
             throw new InvalidRequestException(ApiResponseMemberEnum.PASSWORD_CHECK);
         }
 
-        member.isActive();
+        member.changeSecession();
+        memberRepository.save(member);
 
         return ApiResponse.ofApiResponseEnum(ApiResponseMemberEnum.MEMBER_SECESSION);
     }

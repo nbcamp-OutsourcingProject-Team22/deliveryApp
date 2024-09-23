@@ -44,7 +44,7 @@ public class MemberController {
     }
 
     @PutMapping("/secession")
-    public ResponseEntity<ApiResponse<Void>> secession(@Auth AuthMember authMember, SecessionRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<Void>> secession(@Auth AuthMember authMember, @RequestBody SecessionRequestDto requestDto) {
         ApiResponse<Void> result = memberService.secession(authMember, requestDto);
         return ApiResponse.of(result);
     }
