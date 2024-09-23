@@ -13,6 +13,7 @@ import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import com.sparta.deliveryapp.exception.InvalidRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -117,5 +118,20 @@ public class OrderProceedTest {
         });
 
         assertEquals("거부된 주문입니다.",exception.getApiResponseEnum().getMessage());
+    }
+    @Test
+    void Order_주인_아님(){
+        Order order = new Order(member, store, menu, OrderStatusEnum.REJECTED);
+        ReflectionTestUtils.setField(order, "id", 1L);
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(member.getUserRole()).willReturn(UserRole.USER);
+
+        // when & then
+        HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
+            orderService.proceedOrder(authMember, order.getId());
+        });
+
+        assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
     }
 }

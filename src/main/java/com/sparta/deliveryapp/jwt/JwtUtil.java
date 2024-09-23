@@ -42,7 +42,6 @@ public class JwtUtil {
     //토큰 생성
     public String createToken(Long userId, String username, UserRole userRole, boolean isActive, boolean isSecession) {
         Date date = new Date();
-
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(String.valueOf(userId))

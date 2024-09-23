@@ -14,6 +14,7 @@ import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Order;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -87,6 +88,21 @@ public class OrderServiceTest {
 
         // then
         assertThat(response).isEqualTo("주문 저장에 성공하였습니다.");
+    }
+
+    @Test
+    void Order_유저아님(){
+        OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(member.getUserRole()).willReturn(UserRole.OWNER);
+
+        // when & then
+        HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
+            orderService.requestOrder(authMember, orderRequestDto);
+        });
+
+        assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
     }
 
 

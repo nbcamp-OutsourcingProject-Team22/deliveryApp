@@ -19,6 +19,4 @@ public class AuthInfoResponseDto {
         this.isActive = isActive;
         this.isSecession = isSecession;
     }
-
-
 }

@@ -57,12 +57,10 @@ public class JwtAuthenticationFilter implements Filter {
 
         try {
             Claims claims = jwtUtil.extractClaims(token);
-
             // 토큰을 검증하고, 유효한 경우 필터 체인을 타고 다음 필터로 이동합니다.
             if (jwtUtil.validateToken(token)){
-
                 // 필요하다면 요청에 사용자 정보를 추가할 수 있습니다.
-                httpRequest.setAttribute("id", Integer.parseInt(claims.getSubject()));
+                httpRequest.setAttribute("id", Long.parseLong(claims.getSubject()));
                 httpRequest.setAttribute("username", (claims.get("username", String.class)));
                 httpRequest.setAttribute("role", claims.get("role", String.class));
                 httpRequest.setAttribute("isActive", claims.get("isActive",Boolean.class));
