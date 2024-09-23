@@ -43,7 +43,7 @@ public class OrderAcceptTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private OrderServiceImpl orderServiceImpl;
 
     private AuthMember authMember;
     private Member member;
@@ -74,7 +74,7 @@ public class OrderAcceptTest {
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(store.getMember()).willReturn(member);
         // when
-        orderService.acceptOrder(authMember,1L);
+        orderServiceImpl.acceptOrder(authMember,1L);
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.ACCEPTED);
@@ -87,7 +87,7 @@ public class OrderAcceptTest {
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(store.getMember()).willReturn(member);
         // when
-        orderService.rejectOrder(authMember,1L);
+        orderServiceImpl.rejectOrder(authMember,1L);
 
         // then
         assertThat(order.getStatus()).isEqualTo(OrderStatusEnum.REJECTED);
@@ -103,7 +103,7 @@ public class OrderAcceptTest {
 
         // when
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
-            orderService.acceptOrder(authMember,1L);
+            orderServiceImpl.acceptOrder(authMember,1L);
         });
 
         // then
@@ -120,7 +120,7 @@ public class OrderAcceptTest {
 
         // when
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
-            orderService.rejectOrder(authMember,1L);
+            orderServiceImpl.rejectOrder(authMember,1L);
         });
 
         // then
@@ -134,7 +134,7 @@ public class OrderAcceptTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.acceptOrder(authMember,1L);
+            orderServiceImpl.acceptOrder(authMember,1L);
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -147,7 +147,7 @@ public class OrderAcceptTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.rejectOrder(authMember,1L);
+            orderServiceImpl.rejectOrder(authMember,1L);
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -167,7 +167,7 @@ public class OrderAcceptTest {
 
         // when
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class,
-                ()->orderService.acceptOrder(authMember,1L));
+                ()-> orderServiceImpl.acceptOrder(authMember,1L));
 
 
         // then

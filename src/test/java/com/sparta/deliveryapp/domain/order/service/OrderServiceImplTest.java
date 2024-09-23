@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 
 
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
+public class OrderServiceImplTest {
 
     @Mock
     private StoreRepository storeRepository;
@@ -47,7 +47,7 @@ public class OrderServiceTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private OrderServiceImpl orderServiceImpl;
 
 
     private AuthMember authMember;
@@ -84,7 +84,7 @@ public class OrderServiceTest {
 
 
         // when
-        String response = orderService.requestOrder(authMember, orderRequestDto).getMessage();
+        String response = orderServiceImpl.requestOrder(authMember, orderRequestDto).getMessage();
 
         // then
         assertThat(response).isEqualTo("주문 저장에 성공하였습니다.");
@@ -99,7 +99,7 @@ public class OrderServiceTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.requestOrder(authMember, orderRequestDto);
+            orderServiceImpl.requestOrder(authMember, orderRequestDto);
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -117,7 +117,7 @@ public class OrderServiceTest {
 
         // when & then
         HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
-            orderService.requestOrder(authMember, orderRequestDto);
+            orderServiceImpl.requestOrder(authMember, orderRequestDto);
         });
 
         assertEquals("가게를 찾을 수 없습니다",exception.getApiResponseEnum().getMessage());
@@ -138,7 +138,7 @@ public class OrderServiceTest {
 
         // when & then
         HandleNotFound exception = assertThrows(HandleNotFound.class, () -> {
-            orderService.requestOrder(authMember, orderRequestDto);
+            orderServiceImpl.requestOrder(authMember, orderRequestDto);
         });
 
         assertEquals("메뉴를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());

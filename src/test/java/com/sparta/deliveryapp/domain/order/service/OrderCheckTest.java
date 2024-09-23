@@ -46,7 +46,7 @@ public class OrderCheckTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private OrderServiceImpl orderServiceImpl;
 
     private AuthMember authMember;
     private Member member;
@@ -77,7 +77,7 @@ public class OrderCheckTest {
         given(order.getMember().getId()).willReturn(1L);
         given(member.getId()).willReturn(1L);
 
-        ApiResponse<OrderUserResponseDto> ret = orderService.checkOrder(authMember, order.getId());
+        ApiResponse<OrderUserResponseDto> ret = orderServiceImpl.checkOrder(authMember, order.getId());
 
         assertThat(ret.getMessage()).isEqualTo("주문 조회에 성공하였습니다.");
         assertThat(ret.getData().getProcess()).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
@@ -91,7 +91,7 @@ public class OrderCheckTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.checkOrder(authMember, order.getId());
+            orderServiceImpl.checkOrder(authMember, order.getId());
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -104,7 +104,7 @@ public class OrderCheckTest {
         given(orderRepository.findById(anyLong())).willReturn(Optional.empty());
 
         HandleNotFound exception = assertThrows(HandleNotFound.class,()->{
-            orderService.checkOrder(authMember, order.getId());
+            orderServiceImpl.checkOrder(authMember, order.getId());
         });
 
         assertEquals("주문을 찾을 수 없습니다.", exception.getApiResponseEnum().getMessage());
@@ -133,7 +133,7 @@ public class OrderCheckTest {
         // when & then: 예외가 발생하는지 확인
 
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class,()->{
-            orderService.checkOrder(authMember, order.getId());
+            orderServiceImpl.checkOrder(authMember, order.getId());
         });
 
         assertEquals("권한이 없습니다.", exception.getApiResponseEnum().getMessage());
