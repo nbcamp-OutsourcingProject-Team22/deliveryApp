@@ -120,7 +120,7 @@ public class OrderServiceTest {
             orderService.requestOrder(authMember, orderRequestDto);
         });
 
-        assertEquals("가게를 찾을 수 없습니다.",exception.getApiResponseEnum().getMessage());
+        assertEquals("가게를 찾을 수 없습니다",exception.getApiResponseEnum().getMessage());
     }
 
     @Test
