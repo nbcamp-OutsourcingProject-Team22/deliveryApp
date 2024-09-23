@@ -31,9 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderCheckTest {
@@ -114,18 +116,34 @@ public class OrderCheckTest {
 
     @Test
     void 주문_사람_불일치() {
+        // given: authMember와 order의 member가 다를 때
+        given(memberRepository.findById(authMember.getId()))
+                .willReturn(Optional.of(member));
 
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        // member의 userRole을 지정
         given(member.getUserRole()).willReturn(UserRole.USER);
-        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
-        given(Objects.equals(anyLong(),anyLong())).willReturn(false);
+        given(member.getId()).willReturn(1L); // authMember와 같은 ID 설정
 
+        // 다른 유저로 설정
+        Member anotherMember = mock(Member.class);
+        given(anotherMember.getId()).willReturn(2L);  // 다른 유저 ID 설정
+
+
+        Order anotherOrder = new Order(anotherMember, store, menu, OrderStatusEnum.REQUEST);
+        ReflectionTestUtils.setField(anotherOrder, "id", 1L);
+
+        given(orderRepository.findById(order.getId())).willReturn(Optional.of(anotherOrder));
+
+        // when & then: 예외가 발생하는지 확인
 
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class,()->{
-            orderService.checkOrder(authMember,order.getId());
+            orderService.checkOrder(authMember, order.getId());
         });
 
         assertEquals("권한이 없습니다.", exception.getApiResponseEnum().getMessage());
+
     }
+
+
 
 }
