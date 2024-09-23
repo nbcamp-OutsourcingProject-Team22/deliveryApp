@@ -82,7 +82,7 @@ public class Store extends Timestamped {
      * @param member 확인할 사장
      * @throws HandleUnauthorizedException 가게의 사장이 아닐경우 발생되는 예외
      */
-    public void isOwner(Members member) {
+    public void isOwner(Member member) {
         // 가게의 사장이 아니라면
         StoreValid.isOwnerStore(this.member,member);
     }

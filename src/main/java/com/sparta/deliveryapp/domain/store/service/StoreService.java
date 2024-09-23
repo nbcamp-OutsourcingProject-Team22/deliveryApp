@@ -53,9 +53,9 @@ public class StoreService {
     }
 
     @Transactional
-    public ApiResponse<Void> updateStore(Integer memberId,Long storeId, StoreRequestDto storeRequestDto) {
+    public ApiResponse<Void> updateStore(Long memberId,Long storeId, StoreRequestDto storeRequestDto) {
         // TODO: 여기 바꿔야함
-        Members member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
 
         if (member.getUserRole().equals(UserRole.USER) ) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
