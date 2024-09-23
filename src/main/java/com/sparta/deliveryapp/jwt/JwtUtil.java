@@ -67,7 +67,7 @@ public class JwtUtil {
     }
 
 
-    // 토큰 검증
+//    // 토큰 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);

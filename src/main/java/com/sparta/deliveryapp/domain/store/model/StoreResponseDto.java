@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * 단건 가게 조회
@@ -23,7 +24,7 @@ public class StoreResponseDto {
     private boolean isClose;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private MenuResponse menu;
+    private List<MenuResponse> menu;
 
     public StoreResponseDto(Long id, String storeName, LocalTime openingTime, LocalTime closingTime, Integer minOrderAmount, boolean isClose, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -37,8 +38,8 @@ public class StoreResponseDto {
     }
 
     // Dto -> Entity menu 있음
-    public static StoreResponseDto of(Store store, Menu menu) {
-        MenuResponse menuResponse = new MenuResponse(menu);
+    public static StoreResponseDto of(Store store, List<Menu> menu) {
+        List<MenuResponse> menuResponse = menu.stream().map(MenuResponse::new).toList();
         return new StoreResponseDto(
                 store.getId(),
                 store.getStoreName(),
