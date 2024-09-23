@@ -13,12 +13,10 @@ public class FilterConfig {
         FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(jwtAuthenticationFilter);
-        registrationBean.addUrlPatterns("/menu/*", "/order/*", "/store/*", "/members/secession"); // 필터가 적용될 URL 패턴 설정
+        registrationBean.addUrlPatterns("/*"); // 필터가 적용될 URL 패턴 설정
 
         return registrationBean;
     }
-
-
 }
 
 
