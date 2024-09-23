@@ -18,6 +18,7 @@ public enum ApiResponseOrderEnum implements ApiResponseEnumImpl {
     ORDER_IN_PROGRESS(HttpStatus.BAD_REQUEST,"진행중인 주문입니다."),
 
     // 403
+    NOT_USER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     NOT_OWNER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 404

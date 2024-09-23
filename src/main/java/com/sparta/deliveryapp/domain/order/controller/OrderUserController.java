@@ -19,7 +19,6 @@ public class OrderUserController {
 
     private final OrderService orderService;
 
-    // 추후 사용자 정보 받아야함
     @TrackOrder
     @PostMapping("/request")
     public ResponseEntity<ApiResponse<OrderResponseDto>> requestOrder(@Auth AuthMember member, @RequestBody OrderRequestDto orderRequestDto){
@@ -28,7 +27,6 @@ public class OrderUserController {
         return ApiResponse.of(response, response.getData());
     }
 
-    // 추후 사용자 정보 받아야함
     @TrackOrder
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderUserResponseDto>> checkOrder(@Auth AuthMember member,@PathVariable long orderId){

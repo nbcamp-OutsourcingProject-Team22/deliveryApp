@@ -44,7 +44,7 @@ public class OrderService {
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
         if(!member.getUserRole().equals(UserRole.USER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
@@ -70,14 +70,14 @@ public class OrderService {
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
         if(!member.getUserRole().equals(UserRole.USER)){
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
         if(!Objects.equals(order.getMember().getId(), member.getId())) {
-            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
         OrderUserResponseDto orderUserResponseDto = new OrderUserResponseDto(order.getStore().getId(), order.getStatus().getProcess());
@@ -170,20 +170,9 @@ public class OrderService {
     private void checkOwnerOfStore(Order order, Member member) {
         Store store = order.getStore();
 
-        // Null 검사 추가
-        if (store == null ) {
-            throw new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND);
-        }
-        if (member == null) {
-            throw new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND);
-        }
         if (!member.equals(store.getMember())) {
             throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
         }
     }
-
-
-
-
 }
 
