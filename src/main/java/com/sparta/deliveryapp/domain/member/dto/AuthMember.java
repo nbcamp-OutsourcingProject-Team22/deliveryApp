@@ -19,6 +19,4 @@ public class AuthMember {
         this.isActive = isActive;
         this.isSecession = isSecession;
     }
-
-
 }
