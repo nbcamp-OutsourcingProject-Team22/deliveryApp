@@ -2,7 +2,9 @@ package com.sparta.deliveryapp.domain.order.service;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseOrderEnum;
-import com.sparta.deliveryapp.apiResponseEnum.ApiResponseStoreEnum;
+import com.sparta.deliveryapp.domain.member.UserRole;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
@@ -15,15 +17,11 @@ import com.sparta.deliveryapp.entity.*;
 import com.sparta.deliveryapp.exception.HandleNotFound;
 import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import com.sparta.deliveryapp.exception.InvalidRequestException;
-import com.sun.jdi.request.InvalidRequestStateException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.InvalidPropertiesFormatException;
 import java.util.Objects;
 
 @Service
@@ -31,13 +29,23 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class OrderService {
 
+    private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final MenuRepository menuRepository;
     private final OrderRepository orderRepository;
 
 
+    // 주문 생성 (유저)
     @Transactional
-    public ApiResponse<OrderResponseDto> requestOrder(Member member, OrderRequestDto orderRequestDto) {
+    public ApiResponse<OrderResponseDto> requestOrder(AuthMember authMember, OrderRequestDto orderRequestDto) {
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+
+        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
+        if(!member.getUserRole().equals(UserRole.USER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+        }
 
         Store store = storeRepository.findById(orderRequestDto.getStoreId())
                 .orElseThrow(() ->  new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND));
@@ -54,7 +62,17 @@ public class OrderService {
 
     }
 
-    public ApiResponse<OrderUserResponseDto> checkOrder(Member member, long orderId) {
+    // 주문 상태 조회 (유저)
+    public ApiResponse<OrderUserResponseDto> checkOrder(AuthMember authMember, long orderId) {
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+
+        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
+        if(!member.getUserRole().equals(UserRole.USER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+        }
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
@@ -66,30 +84,61 @@ public class OrderService {
         return new ApiResponse<>(ApiResponseOrderEnum.ORDER_CHECK_SUCCESS,orderUserResponseDto);
     }
 
-    public ApiResponse<OrderOwnerResponseDto> acceptOrder(Member member, long orderId) {
+    // 주문 수락 (주인)
+    public ApiResponse<OrderOwnerResponseDto> acceptOrder(AuthMember authMember, long orderId) {
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+
+        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
+        if(!member.getUserRole().equals(UserRole.OWNER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+        }
+
         Order order =checkOrderStatus(orderId);
+
         //주인 맞는지 체크 해야함
-//      checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
 
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return new ApiResponse<>(ApiResponseOrderEnum.ORDER_ACCEPT_SUCCESS,orderOwnerResponseDto);
     }
 
-    public ApiResponse<OrderOwnerResponseDto> rejectOrder(Member member,long orderId) {
+    // 주문 거절 (주인)
+    public ApiResponse<OrderOwnerResponseDto> rejectOrder(AuthMember authMember,long orderId) {
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+
+        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
+        if(!member.getUserRole().equals(UserRole.OWNER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+        }
+
         Order order =checkOrderStatus(orderId);
         //주인 맞는지 체크 해야함
-//        checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
         return new ApiResponse<>(ApiResponseOrderEnum.ORDER_REJECT_SUCCESS,orderOwnerResponseDto);
     }
 
-    public ApiResponse<OrderOwnerResponseDto> proceedOrder(Member member, long orderId) {
+    // 주문 진행 (주인)
+    public ApiResponse<OrderOwnerResponseDto> proceedOrder(AuthMember authMember, long orderId) {
+
+        Member member = memberRepository.findById(authMember.getId())
+                .orElseThrow(()-> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
+
+        // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
+        if(!member.getUserRole().equals(UserRole.OWNER)){
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
+        }
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
-//        checkOwnerOfStore(order, member);
+        checkOwnerOfStore(order, member);
 
         if(order.getStatus()==OrderStatusEnum.DELIVERED){
             throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_COMPLETE);
@@ -104,9 +153,12 @@ public class OrderService {
     }
 
     private Order checkOrderStatus(long orderId){
+
+        // 주문 찾기
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
+        // 주문 상태가 최초가 아니면 예외
         if(!order.getStatus().equals(OrderStatusEnum.REQUEST)){
             throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_IN_PROGRESS);
         }
@@ -115,18 +167,18 @@ public class OrderService {
     }
 
 
-//    private void checkOwnerOfStore(Order order, Member member) {
-//        Store store = order.getStore();
-//
-//        // Null 검사 추가
-//        if (store == null || store.getMember() == null || member == null) {
-//            throw new IllegalArgumentException("가게 또는 멤버 정보가 누락되었습니다.");
-//        }
-//
-//        if (!store.getMember().equals(member)) {
-//            throw new IllegalArgumentException("해당 가게의 주인이 아닙니다.");
-//        }
-//    }
+    private void checkOwnerOfStore(Order order, Member member) {
+        Store store = order.getStore();
+
+        // Null 검사 추가
+        if (store == null ||  member == null) {
+            throw new IllegalArgumentException("가게 또는 멤버 정보가 누락되었습니다.");
+        }
+
+        if (!member.equals(store.getMember())) {
+            throw new IllegalArgumentException("해당 가게의 주인이 아닙니다.");
+        }
+    }
 
 
 

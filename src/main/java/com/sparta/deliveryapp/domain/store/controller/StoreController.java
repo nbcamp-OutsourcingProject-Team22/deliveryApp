@@ -28,7 +28,7 @@ public class StoreController {
             @Auth AuthMember authMember,
             @RequestBody @Valid StoreRequestDto storeRequestDto
     ) {
-        Integer memberId = authMember.getId();
+        long memberId = authMember.getId();
         ApiResponse<Void> result = storeService.createStore(memberId,storeRequestDto);
         return ApiResponse.of(result);
     }

@@ -1,6 +1,6 @@
 package com.sparta.deliveryapp.domain.store.repository;
 
-import com.sparta.deliveryapp.entity.Members;
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +34,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
      */
     Optional<Store> findByStoreName(String storeName);
 
-    List<Store> findAllByMemberAndIsCloseFalse(Members member);
+    List<Store> findAllByMemberAndIsCloseFalse(Member member);
 
 }
