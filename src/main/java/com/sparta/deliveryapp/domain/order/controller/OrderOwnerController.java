@@ -5,7 +5,7 @@ import com.sparta.deliveryapp.annotation.TrackOrder;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
-import com.sparta.deliveryapp.domain.order.service.OrderService;
+import com.sparta.deliveryapp.domain.order.service.OrderServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,26 +15,26 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderOwnerController {
 
-    private final OrderService orderService;
+    private final OrderServiceImpl orderServiceImpl;
 
     @TrackOrder
     @PutMapping("/{orderId}/accept")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> acceptOrder(@Auth AuthMember member, @PathVariable long orderId){
-        ApiResponse<OrderOwnerResponseDto> response = orderService.acceptOrder(member, orderId);
+        ApiResponse<OrderOwnerResponseDto> response = orderServiceImpl.acceptOrder(member, orderId);
         return ApiResponse.of(response);
     }
 
     @TrackOrder
     @PutMapping("/{orderId}/reject")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> rejectOrder(@Auth AuthMember member,@PathVariable long orderId){
-        ApiResponse<OrderOwnerResponseDto> response = orderService.rejectOrder(member, orderId);
+        ApiResponse<OrderOwnerResponseDto> response = orderServiceImpl.rejectOrder(member, orderId);
         return ApiResponse.of(response);
     }
 
     @TrackOrder
     @PutMapping("/{orderId}/next")
     public ResponseEntity<ApiResponse<OrderOwnerResponseDto>> proceedOrder(@Auth AuthMember member,@PathVariable long orderId){
-        ApiResponse<OrderOwnerResponseDto> response = orderService.proceedOrder(member, orderId);
+        ApiResponse<OrderOwnerResponseDto> response = orderServiceImpl.proceedOrder(member, orderId);
         return ApiResponse.of(response);
     }
 

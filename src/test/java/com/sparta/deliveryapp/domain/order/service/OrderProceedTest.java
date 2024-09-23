@@ -47,7 +47,7 @@ public class OrderProceedTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private OrderServiceImpl orderServiceImpl;
 
     private AuthMember authMember;
     private Member member;
@@ -78,7 +78,7 @@ public class OrderProceedTest {
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(store.getMember()).willReturn(member);
 
-        ApiResponse<OrderOwnerResponseDto> ret = orderService.proceedOrder(authMember, order.getId());
+        ApiResponse<OrderOwnerResponseDto> ret = orderServiceImpl.proceedOrder(authMember, order.getId());
 
         assertThat(ret.getMessage()).isEqualTo("주문 진행에 성공하였습니다.");
         assertThat(ret.getData().getProcess()).isEqualTo("IN DELIVERY");
@@ -97,7 +97,7 @@ public class OrderProceedTest {
 
 
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
-            orderService.proceedOrder(authMember, order.getId());
+            orderServiceImpl.proceedOrder(authMember, order.getId());
         });
 
         assertEquals("완료된 주문입니다.",exception.getApiResponseEnum().getMessage());
@@ -114,7 +114,7 @@ public class OrderProceedTest {
         given(store.getMember()).willReturn(member);
 
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
-            orderService.proceedOrder(authMember, order.getId());
+            orderServiceImpl.proceedOrder(authMember, order.getId());
         });
 
         assertEquals("거부된 주문입니다.",exception.getApiResponseEnum().getMessage());
@@ -129,7 +129,7 @@ public class OrderProceedTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.proceedOrder(authMember, order.getId());
+            orderServiceImpl.proceedOrder(authMember, order.getId());
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
