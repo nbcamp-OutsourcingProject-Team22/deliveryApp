@@ -1,14 +1,18 @@
 package com.sparta.deliveryapp.aop;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
+import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -30,53 +34,54 @@ public class AspectModule {
     public Object trackOrder(ProceedingJoinPoint joinPoint) throws Throwable {
         // API 요청 시각
         LocalDateTime requestTime = LocalDateTime.now();
-
-        // 위 주석에 따라 requestOrder는 동작이 다르기 때문에 메서드 이름으로 구분
         String methodName = joinPoint.getSignature().getName();
-
-        // 메서드의 파라미터 가져오기
         Object[] args = joinPoint.getArgs();
 
         Long orderId = null;
         Long storeId = null;
 
-        if(methodName.equals("requestOrder")){
-            OrderRequestDto OrderRequestDto = (OrderRequestDto) args[0];
-            storeId = OrderRequestDto.getStoreId();
+        if (methodName.equals("requestOrder")) {
+            OrderRequestDto orderRequestDto = (OrderRequestDto) args[1]; // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
+            storeId = orderRequestDto.getStoreId();
 
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 가게 Id : {} :::", storeId);
-        }
-        else{
-            orderId = (Long) args[0];
+        } else {
+            orderId = (Long) args[1];
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 주문 Id : {} :::", orderId);
         }
 
         Object result = null;
 
-        try{
+        try {
             result = joinPoint.proceed();
-        }catch(Exception e){
+        } catch (Exception e) {
             log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
             throw e;
+        } finally {
+            if (methodName.equals("requestOrder")) {
+                ResponseEntity<ApiResponse<OrderResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderResponseDto>>) result;
+                ApiResponse<OrderResponseDto> orderResponseDto = responseEntity.getBody();
+                log.info("::: 주문 Id : {} :::", orderResponseDto.getData().getOrderId());
+            } else if(methodName.equals("checkOrder")) {
 
-        }finally {
-            if(methodName.equals("requestOrder")){
-                OrderResponseDto orderResponse = (OrderResponseDto) result;
-                orderId = orderResponse.getOrderId();
-                log.info("::: 주문 Id : {} :::", orderId);
+                ResponseEntity<ApiResponse<OrderUserResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderUserResponseDto>>) result;
+                ApiResponse<OrderUserResponseDto> orderUserResponseDto = responseEntity.getBody();
+                log.info("::: 가게 Id : {} :::",orderUserResponseDto.getData().getStoreId() );
+                log.info("::: 주문 상태 : {} :::",orderUserResponseDto.getData().getProcess());
             }
-            else{
-                OrderOwnerResponseDto orderOwnerResponseDto = (OrderOwnerResponseDto) result;
-                storeId = orderOwnerResponseDto.getStoreId();
-                log.info("::: 가게 Id : {} :::", storeId);
+            else {
+                ResponseEntity<ApiResponse<OrderOwnerResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderOwnerResponseDto>>) result;
+                ApiResponse<OrderOwnerResponseDto> orderOwnerResponseDto = responseEntity.getBody();
+                log.info("::: 가게 Id : {} :::",orderOwnerResponseDto.getData().getStoreId());
+                log.info("::: 주문 상태 : {} :::",orderOwnerResponseDto.getData().getProcess());
             }
-
         }
 
         return result;
     }
+
 
 
 }
