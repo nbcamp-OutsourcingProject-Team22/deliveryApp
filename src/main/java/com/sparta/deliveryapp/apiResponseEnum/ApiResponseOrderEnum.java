@@ -13,8 +13,7 @@ public enum ApiResponseOrderEnum implements ApiResponseEnumImpl {
     ORDER_PROCEED_SUCCESS(HttpStatus.OK, "주문 진행에 성공하였습니다."),
 
     // 400
-    ORDER_COMPLETE(HttpStatus.BAD_REQUEST,"완료된 주문입니다."),
-    ORDER_REJECT(HttpStatus.BAD_REQUEST,"거부된 주문입니다."),
+    ORDER_DONE(HttpStatus.BAD_REQUEST,"만료된 주문입니다."),
     ORDER_IN_PROGRESS(HttpStatus.BAD_REQUEST,"진행중인 주문입니다."),
 
     // 403
