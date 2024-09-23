@@ -24,7 +24,7 @@ public class OrderUserController {
     public ResponseEntity<ApiResponse<OrderResponseDto>> requestOrder(@Auth AuthMember member, @RequestBody OrderRequestDto orderRequestDto){
 
         ApiResponse<OrderResponseDto> response = orderService.requestOrder(member, orderRequestDto);
-        return ApiResponse.of(response, response.getData());
+        return ApiResponse.of(response);
     }
 
     @TrackOrder
@@ -32,7 +32,7 @@ public class OrderUserController {
     public ResponseEntity<ApiResponse<OrderUserResponseDto>> checkOrder(@Auth AuthMember member,@PathVariable long orderId){
 
         ApiResponse<OrderUserResponseDto> response = orderService.checkOrder(member, orderId);
-        return ApiResponse.of(response, response.getData());
+        return ApiResponse.of(response);
     }
 
 

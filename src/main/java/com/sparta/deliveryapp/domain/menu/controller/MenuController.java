@@ -37,7 +37,7 @@ public class MenuController {
             @RequestBody MenuRequest menuRequest
     ) {
         ApiResponse<MenuResponse> result = menuService.updateMenu(authMember, storeId, menuId, menuRequest);
-        return ApiResponse.of(result, result.getData());
+        return ApiResponse.of(result);
     }
 
     // 메뉴 삭제
