@@ -8,6 +8,7 @@ public enum ApiResponseMenuEnum implements ApiResponseEnumImpl {
     // 200
     MENU_SAVE_SUCCESS(HttpStatus.OK, "메뉴 저장에 성공하였습니다."),
     MENU_UPDATE_SUCCESS(HttpStatus.OK, "메뉴 수정에 성공하였습니다."),
+    MENU_DELETE_SUCCESS(HttpStatus.OK, "메뉴 삭제에 성공하였습니다."),
 
     // 400
     MENU_MAX(HttpStatus.BAD_REQUEST,"입력된 정보가 틀렸습니다."),
@@ -17,6 +18,7 @@ public enum ApiResponseMenuEnum implements ApiResponseEnumImpl {
 
     // 404
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "메뉴를 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final int code;
