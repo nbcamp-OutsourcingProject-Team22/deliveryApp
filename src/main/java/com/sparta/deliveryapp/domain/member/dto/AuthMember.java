@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 public class AuthMember {
-    private final Integer id;
+    private final Long id;
     private final String username;
     private final UserRole role;
     private final Boolean isActive;
     private final Boolean isSecession;
 
-    public AuthMember(Integer id, String username, UserRole role, Boolean isActive ,Boolean isSecession){
+    public AuthMember(Long id, String username, UserRole role, Boolean isActive ,Boolean isSecession){
         this.id = id;
         this.username = username;
         this.role = role;

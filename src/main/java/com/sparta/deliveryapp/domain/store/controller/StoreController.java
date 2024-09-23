@@ -23,25 +23,24 @@ import java.util.List;
 public class StoreController {
     private final StoreService storeService;
 
-    // TODO: 사용자 받아야함 @Auth 같은걸로
     @PostMapping
     public ResponseEntity<ApiResponse<Void>>  createStore(
             @Auth AuthMember authMember,
             @RequestBody @Valid StoreRequestDto storeRequestDto
     ) {
-        Integer memberId = authMember.getId();
+        long memberId = authMember.getId();
         ApiResponse<Void> result = storeService.createStore(memberId,storeRequestDto);
         return ApiResponse.of(result);
     }
 
-    // TODO: 사용자 받아야함 @Auth 같은걸로
     @PutMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>>  updateStore(
-//            @Auth AuthUser authUser,
+            @Auth AuthMember authMember,
             @PathVariable Long storeId,
             @RequestBody StoreRequestDto storeRequestDto
     ) {
-        ApiResponse<Void> result = storeService.updateStore(storeId, storeRequestDto);
+        Integer memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.updateStore(memberId,storeId, storeRequestDto);
         return ApiResponse.of(result);
     }
 

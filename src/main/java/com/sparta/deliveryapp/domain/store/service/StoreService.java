@@ -10,7 +10,7 @@ import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
-import com.sparta.deliveryapp.entity.Members;
+import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
 import com.sparta.deliveryapp.exception.HandleMaxException;
@@ -33,11 +33,11 @@ public class StoreService {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
 
-    // TODO: 멤버 연관관계 추가해야함
     @Transactional
-    public ApiResponse<Void> createStore(Integer memberId,StoreRequestDto requestDto) {
+    public ApiResponse<Void> createStore(Long memberId,StoreRequestDto requestDto) {
         // 여기 바꿔야함
-        Members member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+        Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+
 
         if (member.getUserRole().equals(UserRole.USER) ) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
@@ -52,10 +52,16 @@ public class StoreService {
         return ApiResponse.ofApiResponseEnum(ApiResponseStoreEnum.STORE_SAVE_SUCCESS);
     }
 
-    // TODO: 수정할때 가게만든 사장이랑, 로그인한 사장이 일치하는지 확인해야함
     @Transactional
-    public ApiResponse<Void> updateStore(Long storeId, StoreRequestDto storeRequestDto) {
+    public ApiResponse<Void> updateStore(Integer memberId,Long storeId, StoreRequestDto storeRequestDto) {
+        // TODO: 여기 바꿔야함
+        Members member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
+
+        if (member.getUserRole().equals(UserRole.USER) ) {
+            throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
+        }
         Store store = findByStoreId(storeId);
+        store.isOwner(member);
         Store updateStore = Store.builder()
                 .id(store.getId())
                 .storeName(Objects.isNull(storeRequestDto.getStoreName()) ? store.getStoreName() : storeRequestDto.getStoreName() )
@@ -173,7 +179,7 @@ public class StoreService {
      * @return 조회된 가게들 갯수 반환
      */
     @Transactional(readOnly = true)
-    public Integer getStoreCount(Members member) {
+    public Integer getStoreCount(Member member) {
         List<Store> stores = storeRepository.findAllByMemberAndIsCloseFalse(member);
         return stores.size();
     }
