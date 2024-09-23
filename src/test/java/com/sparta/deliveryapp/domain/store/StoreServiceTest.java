@@ -127,8 +127,7 @@ class StoreServiceTest {
         @DisplayName("가게 생성 실패 _ 유저 못 찾음")
         void test2() {
             // given - 성공하였을때 메세지 준비, 연관관계 설정 멤버 추가
-            // 여기 메세지 바꿔야함
-            String expectedExceptionMessage = "비밀번호를 확인해주세요.";
+            String expectedExceptionMessage = "멤버를 찾을 수 없습니다.";
             given(memberRepository.findById(testMemberId1)).willReturn(Optional.empty());
 
             // when - 가게 생성 시도
@@ -227,7 +226,7 @@ class StoreServiceTest {
         @DisplayName("가게 수정 실패 _ 유저 못찾음")
         void test3() {
             // given - 실패하였을때, 메시지 준비
-            String expectedExceptionMessage = "비밀번호를 확인해주세요.";
+            String expectedExceptionMessage = "멤버를 찾을 수 없습니다.";
 
             given(memberRepository.findById(testMemberId1)).willReturn(Optional.empty());
 
@@ -461,7 +460,7 @@ class StoreServiceTest {
         @DisplayName("가게 폐업 실패 _ 유저 못찾음")
         void test3() {
             // given - 조회에 성공할 가게 준비, 폐업할 가게 준비
-            String expectedExceptionMessage = "비밀번호를 확인해주세요.";
+            String expectedExceptionMessage = "멤버를 찾을 수 없습니다.";
             given(storeRepository.findById(testStoreId)).willReturn(Optional.of(testStore));
             given(memberRepository.findById(testMemberId1)).willReturn(Optional.empty());
 
