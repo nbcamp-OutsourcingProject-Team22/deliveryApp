@@ -43,7 +43,7 @@ public class OrderService {
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND));
 
         // UserRole에 따라 필터에서 걸러지면 이건 지워주세용
-        if(!member.getUserRole().equals(UserRole.USER)){
+        if(member.getUserRole().equals(UserRole.OWNER)){
             throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_USER);
         }
 
@@ -54,11 +54,16 @@ public class OrderService {
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.MENU_NOT_FOUND));
 
 
-        Order order = new Order(member,store,menu, OrderStatusEnum.REQUEST);
+        Order order = new Order(
+                member,
+                store,
+                menu,
+                OrderStatusEnum.REQUEST
+        );
         Order savedOrder = orderRepository.save(order);
 
         OrderResponseDto orderResponseDto = new OrderResponseDto(savedOrder.getId());
-        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_SAVE_SUCCESS,orderResponseDto);
+        return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_SAVE_SUCCESS,orderResponseDto);
 
     }
 
@@ -81,10 +86,11 @@ public class OrderService {
         }
 
         OrderUserResponseDto orderUserResponseDto = new OrderUserResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_CHECK_SUCCESS,orderUserResponseDto);
+        return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_CHECK_SUCCESS,orderUserResponseDto);
     }
 
     // 주문 수락 (주인)
+    @Transactional
     public ApiResponse<OrderOwnerResponseDto> acceptOrder(AuthMember authMember, long orderId) {
 
         Member member = memberRepository.findById(authMember.getId())
@@ -100,12 +106,15 @@ public class OrderService {
         //주인 맞는지 체크 해야함
         checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.ACCEPTED);
+        orderRepository.save(order);
+
 
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_ACCEPT_SUCCESS,orderOwnerResponseDto);
+        return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_ACCEPT_SUCCESS,orderOwnerResponseDto);
     }
 
     // 주문 거절 (주인)
+    @Transactional
     public ApiResponse<OrderOwnerResponseDto> rejectOrder(AuthMember authMember,long orderId) {
 
         Member member = memberRepository.findById(authMember.getId())
@@ -120,11 +129,14 @@ public class OrderService {
         //주인 맞는지 체크 해야함
         checkOwnerOfStore(order, member);
         order.changeStatus(OrderStatusEnum.REJECTED);
+        orderRepository.save(order);
+
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_REJECT_SUCCESS,orderOwnerResponseDto);
+        return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_REJECT_SUCCESS,orderOwnerResponseDto);
     }
 
     // 주문 진행 (주인)
+    @Transactional
     public ApiResponse<OrderOwnerResponseDto> proceedOrder(AuthMember authMember, long orderId) {
 
         Member member = memberRepository.findById(authMember.getId())
@@ -147,9 +159,10 @@ public class OrderService {
             throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_REJECT);
         }
 
-        order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()]);
+        order.changeStatus(OrderStatusEnum.values()[order.getStatus().getNum()+1]);
+        orderRepository.save(order);
         OrderOwnerResponseDto orderOwnerResponseDto = new OrderOwnerResponseDto(order.getStore().getId(), order.getStatus().getProcess());
-        return new ApiResponse<>(ApiResponseOrderEnum.ORDER_PROCEED_SUCCESS,orderOwnerResponseDto);
+        return ApiResponse.ofApiResponseEnum(ApiResponseOrderEnum.ORDER_PROCEED_SUCCESS,orderOwnerResponseDto);
     }
 
     private Order checkOrderStatus(long orderId){
@@ -158,8 +171,9 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new HandleNotFound(ApiResponseOrderEnum.ORDER_NOT_FOUND));
 
+
         // 주문 상태가 최초가 아니면 예외
-        if(!order.getStatus().equals(OrderStatusEnum.REQUEST)){
+        if(!order.getStatus().getProcess().equals(OrderStatusEnum.REQUEST.getProcess())){
             throw new InvalidRequestException(ApiResponseOrderEnum.ORDER_IN_PROGRESS);
         }
 

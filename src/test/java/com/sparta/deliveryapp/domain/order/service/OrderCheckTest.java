@@ -6,15 +6,12 @@ import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
 import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.order.OrderStatusEnum;
-import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
-import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import com.sparta.deliveryapp.domain.order.repository.OrderRepository;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
 import com.sparta.deliveryapp.entity.*;
 import com.sparta.deliveryapp.exception.HandleNotFound;
 import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,7 +77,7 @@ public class OrderCheckTest {
         given(order.getMember().getId()).willReturn(1L);
         given(member.getId()).willReturn(1L);
 
-        ApiResponse<OrderUserResponseDto> ret = orderService.checkOrder(authMember,order.getId());
+        ApiResponse<OrderUserResponseDto> ret = orderService.checkOrder(authMember, order.getId());
 
         assertThat(ret.getMessage()).isEqualTo("주문 조회에 성공하였습니다.");
         assertThat(ret.getData().getProcess()).isEqualTo(OrderStatusEnum.REQUEST.getProcess());
@@ -95,7 +91,7 @@ public class OrderCheckTest {
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
-            orderService.checkOrder(authMember,order.getId());
+            orderService.checkOrder(authMember, order.getId());
         });
 
         assertEquals("권한이 없습니다.",exception.getApiResponseEnum().getMessage());
@@ -108,7 +104,7 @@ public class OrderCheckTest {
         given(orderRepository.findById(anyLong())).willReturn(Optional.empty());
 
         HandleNotFound exception = assertThrows(HandleNotFound.class,()->{
-            orderService.checkOrder(authMember,order.getId());
+            orderService.checkOrder(authMember, order.getId());
         });
 
         assertEquals("주문을 찾을 수 없습니다.", exception.getApiResponseEnum().getMessage());

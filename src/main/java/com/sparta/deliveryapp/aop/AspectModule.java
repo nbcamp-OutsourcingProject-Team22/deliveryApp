@@ -1,14 +1,18 @@
 package com.sparta.deliveryapp.aop;
 
+import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
+import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -36,15 +40,15 @@ public class AspectModule {
         Long orderId = null;
         Long storeId = null;
 
-        // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
+
         if (methodName.equals("requestOrder")) {
-            OrderRequestDto orderRequestDto = (OrderRequestDto) args[1];  // args[1]로 수정
+            OrderRequestDto orderRequestDto = (OrderRequestDto) args[1]; // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
             storeId = orderRequestDto.getStoreId();
 
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 가게 Id : {} :::", storeId);
         } else {
-            orderId = (Long) args[0];
+            orderId = (Long) args[1];
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 주문 Id : {} :::", orderId);
         }
@@ -58,13 +62,20 @@ public class AspectModule {
             throw e;
         } finally {
             if (methodName.equals("requestOrder")) {
-                OrderResponseDto orderResponse = (OrderResponseDto)result;
-                orderId = orderResponse.getOrderId();
-                log.info("::: 주문 Id : {} :::", orderId);
-            } else {
-                OrderOwnerResponseDto orderOwnerResponseDto = (OrderOwnerResponseDto) result;
-                storeId = orderOwnerResponseDto.getStoreId();
-                log.info("::: 가게 Id : {} :::", storeId);
+                ResponseEntity<ApiResponse<OrderResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderResponseDto>>) result;
+                ApiResponse<OrderResponseDto> orderResponseDto = responseEntity.getBody();
+                log.info("::: 주문 Id : {} :::", orderResponseDto.getData().getOrderId());
+            } else if(methodName.equals("checkOrder")) {
+                ResponseEntity<ApiResponse<OrderUserResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderUserResponseDto>>) result;
+                ApiResponse<OrderUserResponseDto> orderUserResponseDto = responseEntity.getBody();
+                log.info("::: 가게 Id : {} :::",orderUserResponseDto.getData().getStoreId() );
+                log.info("::: 주문 상태 : {} :::",orderUserResponseDto.getData().getProcess());
+            }
+            else {
+                ResponseEntity<ApiResponse<OrderOwnerResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderOwnerResponseDto>>) result;
+                ApiResponse<OrderOwnerResponseDto> orderOwnerResponseDto = responseEntity.getBody();
+                log.info("::: 가게 Id : {} :::",orderOwnerResponseDto.getData().getStoreId());
+                log.info("::: 주문 상태 : {} :::",orderOwnerResponseDto.getData().getProcess());
             }
         }
 

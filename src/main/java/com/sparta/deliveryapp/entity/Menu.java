@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
     @Column(nullable = false)
