@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class MenuRequest {
 
-    @NotNull(message = "메뉴이름은 공백일 수 없습니다.")
+    @NotNull(message = "메뉴이름은 공백일 수 없습니다.") // 검증하기 위해 @NotNull
     private String menuName;
 
     @NotNull(message = "메뉴가격은 공백일 수 없습니다.")

@@ -17,13 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-
-    //이게 aop 중복의 근원임
-//    @Bean
-//    public AspectModule getAspectAop(){
-//        return new AspectModule();
-//    }
-
     // ArgumentResolver 등록
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
