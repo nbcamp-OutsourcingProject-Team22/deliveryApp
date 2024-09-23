@@ -25,7 +25,7 @@ public class StoreValid {
      */
     public static void isOwnerStore(Member realOwner, Member otherOwner) {
         // 가게의 사장이 아니라면
-        if(!(realOwner.getId() == otherOwner.getId())) {
+        if(!(realOwner.getId().equals(otherOwner.getId()) )) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.STORE_NOT_OWNER);
         }
     }

@@ -171,12 +171,14 @@ public class OrderService {
         Store store = order.getStore();
 
         // Null 검사 추가
-        if (store == null ||  member == null) {
-            throw new IllegalArgumentException("가게 또는 멤버 정보가 누락되었습니다.");
+        if (store == null ) {
+            throw new HandleNotFound(ApiResponseOrderEnum.STORE_NOT_FOUND);
         }
-
+        if (member == null) {
+            throw new HandleNotFound(ApiResponseOrderEnum.MEMBER_NOT_FOUND);
+        }
         if (!member.equals(store.getMember())) {
-            throw new IllegalArgumentException("해당 가게의 주인이 아닙니다.");
+            throw new HandleUnauthorizedException(ApiResponseOrderEnum.NOT_OWNER);
         }
     }
 
