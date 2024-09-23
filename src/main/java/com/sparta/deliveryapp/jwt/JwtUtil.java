@@ -40,7 +40,7 @@ public class JwtUtil {
     }
 
     //토큰 생성
-    public String createToken(Integer userId, String username, UserRole userRole) {
+    public String createToken(Integer userId, String username, UserRole userRole, boolean isActive, boolean isSecession) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -48,6 +48,8 @@ public class JwtUtil {
                         .setSubject(String.valueOf(userId))
                         .claim("username", username)
                         .claim("role", userRole.name())
+                        .claim("isActive", isActive)
+                        .claim("isSecession", isSecession)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
