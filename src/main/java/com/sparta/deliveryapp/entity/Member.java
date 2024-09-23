@@ -45,4 +45,8 @@ public class Member extends Timestamped {
         this.password = encodedPassword;
         this.userRole = userRole;
     }
+
+    public void changeSecession(){
+        this.isSecession = !this.isSecession;
+    }
 }
