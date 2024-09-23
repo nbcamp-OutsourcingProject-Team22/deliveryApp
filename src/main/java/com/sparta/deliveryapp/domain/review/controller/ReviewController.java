@@ -1,8 +1,11 @@
 package com.sparta.deliveryapp.domain.review.controller;
 
 
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponseReviewEnum;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.review.dto.ReviewRatingResponseDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewRequestDto;
 import com.sparta.deliveryapp.domain.review.dto.ReviewResponseDto;
 import com.sparta.deliveryapp.domain.review.service.ReviewService;
@@ -23,9 +26,9 @@ public class ReviewController {
 
     // 리뷰 생성
     @PostMapping
-    public ResponseEntity<ApiResponse<ReviewResponseDto>> createReview
-            (@RequestBody @Valid ReviewRequestDto requestDto){//@Auth AuthMember authMember
-        ApiResponse<ReviewResponseDto> createdReview = reviewService.createReview(requestDto); //,authMember);
+    public ResponseEntity<ApiResponse<ReviewRatingResponseDto>> createReview
+            (@RequestBody @Valid ReviewRequestDto requestDto,@Auth AuthMember authMember){
+        ApiResponse<ReviewRatingResponseDto> createdReview = reviewService.createReview(requestDto,authMember);
         return ResponseEntity.ok(createdReview);
     }
 
@@ -42,10 +45,10 @@ public class ReviewController {
 
     // 별점 범위 별 리뷰 조회
     @GetMapping("/rating")
-    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getReviewsByRating
+    public ResponseEntity<ApiResponse<List<ReviewRatingResponseDto>>> getReviewsByRating
         (@RequestParam int minRating,@RequestParam int maxRating){
 
-        ApiResponse<List<ReviewResponseDto>> ratingReviewList = reviewService
+        ApiResponse<List<ReviewRatingResponseDto>> ratingReviewList = reviewService
                 .getReviewsByRating(minRating,maxRating);
         if (ratingReviewList.getData().isEmpty()){
             throw new HandleUnauthorizedException(ApiResponseReviewEnum.EMPTY_RATING_REVIEW);
