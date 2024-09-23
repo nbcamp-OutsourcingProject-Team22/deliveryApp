@@ -46,15 +46,9 @@ public class ApiResponse<T> {
         return new ApiResponse<>(apiResponseEnum,data);
     }
 
-    // 상태코드, 메세지만 반환시 사용 (컨트롤러 -> 클라이언트)
-    public static ResponseEntity<ApiResponse<Void>> of(ApiResponse<Void> apiResponse) {
-        return ResponseEntity.status(apiResponse.getCode())
-                .body(new ApiResponse<>(apiResponse.getCode(),apiResponse.message));
-    }
-
     // 데이터, 상태코드, 메세지만 반환시 사용 (컨트롤러 -> 클라이언트)
-    public static <T> ResponseEntity<ApiResponse<T>> of(ApiResponse<T> apiResponse, T data) {
+    public static <T> ResponseEntity<ApiResponse<T>> of(ApiResponse<T> apiResponse) {
         return ResponseEntity.status(apiResponse.getCode())
-                .body(new ApiResponse<>(apiResponse.getCode(),apiResponse.getMessage(),data));
+                .body(new ApiResponse<>(apiResponse.getCode(),apiResponse.getMessage(),apiResponse.getData()));
     }
 }

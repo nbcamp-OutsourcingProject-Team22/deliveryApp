@@ -9,7 +9,7 @@ import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
 import com.sparta.deliveryapp.domain.store.repository.StoreRepository;
-import com.sparta.deliveryapp.domain.store.service.StoreService;
+import com.sparta.deliveryapp.domain.store.service.StoreServiceImpl;
 import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.entity.Menu;
 import com.sparta.deliveryapp.entity.Store;
@@ -66,7 +66,7 @@ class StoreServiceTest {
     private MenuRepository menuRepository;
 
     @InjectMocks
-    private StoreService storeService;
+    private StoreServiceImpl storeService;
 
     @BeforeEach
     void setUp() {

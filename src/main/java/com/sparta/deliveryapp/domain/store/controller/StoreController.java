@@ -54,7 +54,7 @@ public class StoreController {
             @PathVariable String storeName
     ) {
         ApiResponse<StoreResponseDto> result = storeService.getStore(storeName);
-        return ApiResponse.of(result,result.getData());
+        return ApiResponse.of(result);
     }
 
     /**
@@ -76,7 +76,7 @@ public class StoreController {
         Sort.Direction direction = Sort.Direction.fromString(sort);
         Pageable pageable = PageRequest.of(page, size, direction,"createdAt");
         ApiResponse<List<StoresResponseDto>> result = storeService.getStores(storeName,pageable);
-        return ApiResponse.of(result,result.getData());
+        return ApiResponse.of(result);
     }
 
     /**
