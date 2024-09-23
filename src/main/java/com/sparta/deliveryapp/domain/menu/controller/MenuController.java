@@ -1,8 +1,9 @@
 package com.sparta.deliveryapp.domain.menu.controller;
 
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.menu.dto.MenuRequest;
-import com.sparta.deliveryapp.domain.menu.repository.MenuRepository;
 import com.sparta.deliveryapp.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +12,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/menus/{storeId}")
+@RequestMapping("/menus")
 public class MenuController {
     private final MenuService menuService;
-    private final MenuRepository menuRepository;
 
-    // 메뉴 생성
-    @PostMapping
+    // 메뉴 생성 (controller 에서는 보내주기만 하기
+    @PostMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>> createMenu (
-//            @Auth AuthUser authUser,
+            @Auth AuthMember authMember,
             @PathVariable Long storeId,
             @RequestBody @Valid MenuRequest menuRequest){
-//       Long storeId = authUser.getId();
-        ApiResponse<Void> result = menuService.createMenu(storeId, menuRequest);
-//        String test = "실험중";
+
+        ApiResponse<Void> result = menuService.createMenu(authMember, storeId, menuRequest);
         return ApiResponse.of(result);
     }
 }

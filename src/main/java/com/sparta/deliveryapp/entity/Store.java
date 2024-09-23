@@ -5,6 +5,7 @@ import com.sparta.deliveryapp.domain.common.Timestamped;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.validator.StoreValid;
 import com.sparta.deliveryapp.exception.HandleNotFound;
+import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,12 +46,27 @@ public class Store extends Timestamped {
                 requestDto.getOpeningTime(),
                 requestDto.getClosingTime(),
                 requestDto.getMinOrderAmount(),
-                false
+                false,
+                null
         );
     }
 
     public void closed() {
         this.isClose = true;
+    }
+
+    /**
+     *  멤버와 1:N 관계
+     */
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    /**
+     *  멤버 연관관게 설정
+     */
+    public void addMember(Member member) {
+        this.member = member;
     }
 
     /**
@@ -62,16 +78,12 @@ public class Store extends Timestamped {
     }
 
     /**
-     *  멤버와 1:N 관계
+     * 가게의 사장인지 확인
+     * @param member 확인할 사장
+     * @throws HandleUnauthorizedException 가게의 사장이 아닐경우 발생되는 예외
      */
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private Member member;
-
-    /**
-     *  멤버 연관관게 설정
-     */
-//    public void addMember(Member member) {
-//        this.member = member;
-//    }
-
+    public void isOwner(Member member) {
+        // 가게의 사장이 아니라면
+        StoreValid.isOwnerStore(this.member,member);
+    }
 }

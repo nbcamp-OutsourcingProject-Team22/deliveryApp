@@ -1,6 +1,8 @@
 package com.sparta.deliveryapp.domain.store.controller;
 
+import com.sparta.deliveryapp.annotation.Auth;
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.store.model.StoreRequestDto;
 import com.sparta.deliveryapp.domain.store.model.StoreResponseDto;
 import com.sparta.deliveryapp.domain.store.model.StoresResponseDto;
@@ -21,25 +23,24 @@ import java.util.List;
 public class StoreController {
     private final StoreService storeService;
 
-    // TODO: 사용자 받아야함 @Auth 같은걸로
     @PostMapping
     public ResponseEntity<ApiResponse<Void>>  createStore(
-//            @Auth AuthUser authUser;
+            @Auth AuthMember authMember,
             @RequestBody @Valid StoreRequestDto storeRequestDto
     ) {
-//        Long memberId = authUser.getId();
-        ApiResponse<Void> result = storeService.createStore(storeRequestDto);
+        long memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.createStore(memberId,storeRequestDto);
         return ApiResponse.of(result);
     }
 
-    // TODO: 사용자 받아야함 @Auth 같은걸로
     @PutMapping("/{storeId}")
     public ResponseEntity<ApiResponse<Void>>  updateStore(
-//            @Auth AuthUser authUser,
+            @Auth AuthMember authMember,
             @PathVariable Long storeId,
             @RequestBody StoreRequestDto storeRequestDto
     ) {
-        ApiResponse<Void> result = storeService.updateStore(storeId, storeRequestDto);
+        Long memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.updateStore(memberId,storeId, storeRequestDto);
         return ApiResponse.of(result);
     }
 
@@ -84,8 +85,12 @@ public class StoreController {
      * @return 폐업성공 메세지
      */
     @DeleteMapping("/{storeId}")
-    public ResponseEntity<ApiResponse<Void>> closeStore(@PathVariable Long storeId) {
-        ApiResponse<Void> result = storeService.closeStore(storeId);
+    public ResponseEntity<ApiResponse<Void>> closeStore(
+            @Auth AuthMember authMember,
+            @PathVariable Long storeId
+    ) {
+        Long memberId = authMember.getId();
+        ApiResponse<Void> result = storeService.closeStore(memberId,storeId);
         return ApiResponse.of(result);
     }
 }

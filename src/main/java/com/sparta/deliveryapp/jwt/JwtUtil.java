@@ -65,6 +65,7 @@ public class JwtUtil {
         return null;
     }
 
+
     // 토큰 검증
     public boolean validateToken(String token) {
         try {

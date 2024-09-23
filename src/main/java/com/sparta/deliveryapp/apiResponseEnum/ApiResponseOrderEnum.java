@@ -18,9 +18,11 @@ public enum ApiResponseOrderEnum implements ApiResponseEnumImpl {
     ORDER_IN_PROGRESS(HttpStatus.BAD_REQUEST,"진행중인 주문입니다."),
 
     // 403
+    NOT_USER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
     NOT_OWNER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 404
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다."),
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "가게를 찾을 수 없습니다."),
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "메뉴를 찾을 수 없습니다.");
