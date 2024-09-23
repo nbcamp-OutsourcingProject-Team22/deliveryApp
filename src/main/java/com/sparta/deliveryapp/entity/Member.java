@@ -27,7 +27,7 @@ public class Member extends Timestamped {
     private UserRole userRole;
 
     @ColumnDefault("true")
-    private boolean isActive; //활동계정 default true
+    private boolean isActive=true; //활동계정 default true
 
     @ColumnDefault("false")
     private boolean isSecession; //회원탈퇴 default false

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,11 +18,11 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
 
-
-    @Bean
-    public AspectModule getAspectAop(){
-        return new AspectModule();
-    }
+    //이게 aop 중복의 근원임
+//    @Bean
+//    public AspectModule getAspectAop(){
+//        return new AspectModule();
+//    }
 
     // ArgumentResolver 등록
     @Override

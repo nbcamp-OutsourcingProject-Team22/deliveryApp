@@ -38,7 +38,6 @@ public class StoreService {
         // 여기 바꿔야함
         Member member = memberRepository.findById(memberId).orElseThrow( () -> new HandleNotFound(ApiResponseMemberEnum.PASSWORD_UNAUTHORIZED));
 
-
         if (member.getUserRole().equals(UserRole.USER) ) {
             throw new HandleUnauthorizedException(ApiResponseStoreEnum.NOT_OWNER);
         }
