@@ -2,7 +2,11 @@ package com.sparta.deliveryapp.filter;
 
 import com.sparta.deliveryapp.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.*;
+import jakarta.servlet.FilterConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Slf4j
-@Component
 public class JwtAuthenticationFilter implements Filter {
     private final JwtUtil jwtUtil;
 
@@ -19,10 +22,10 @@ public class JwtAuthenticationFilter implements Filter {
         this.jwtUtil = jwtUtil;
     }
 
-//    @Override
-//    public void init(FilterConfig filterConfig) throws ServletException {
-//        // 초기화 로직이 필요한 경우 구현
-//    }
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        Filter.super.init(filterConfig);// 초기화 로직이 필요한 경우 구현
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -59,22 +62,35 @@ public class JwtAuthenticationFilter implements Filter {
             Claims claims = jwtUtil.extractClaims(token);
 
             // 토큰을 검증하고, 유효한 경우 필터 체인을 타고 다음 필터로 이동합니다.
-            if (jwtUtil.validateToken(token)){
+            httpRequest.setAttribute("id", Long.parseLong(claims.getSubject()));
+            httpRequest.setAttribute("username", (claims.get("username", String.class)));
+            httpRequest.setAttribute("role", claims.get("role", String.class));
+            httpRequest.setAttribute("isActive", claims.get("isActive",Boolean.class));
+            httpRequest.setAttribute("isSecession", claims.get("isSecession", Boolean.class));
 
-                // 필요하다면 요청에 사용자 정보를 추가할 수 있습니다.
-                httpRequest.setAttribute("id", Integer.parseInt(claims.getSubject()));
-                httpRequest.setAttribute("username", (claims.get("username", String.class)));
-                httpRequest.setAttribute("role", claims.get("role", String.class));
-                httpRequest.setAttribute("isActive", claims.get("isActive",Boolean.class));
-                httpRequest.setAttribute("isSecession", claims.get("isSecession", Boolean.class));
+            chain.doFilter(request, response);
 
-                chain.doFilter(request, response);
-            } else {
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 유효하지 않습니다.");
-            }
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명입니다. URL: {}", url, e);
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않는 JWT 서명입니다.");
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token, 만료된 JWT 토큰입니다. URL: {}", url, e);
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰입니다. URL: {}", url, e);
+            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims is empty, 잘못된 JWT 토큰입니다. URL: {}", url, e);
+            httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
         } catch (Exception e) {
+            log.error("JWT 토큰 검증 중 오류가 발생했습니다. URL: {}", url, e);
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰 검증 중 오류가 발생했습니다.");
         }
+
+    }
+    @Override
+    public void destroy() {
+        Filter.super.destroy();
     }
 }
 

@@ -8,12 +8,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FilterConfig {
 
+    private final JwtUtil jwtUtil;
+
+    public FilterConfig(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> JwtAuthenticationFilter() {
         FilterRegistrationBean<JwtAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
-        JwtUtil jwtUtil = new JwtUtil();
+
         registrationBean.setFilter(new JwtAuthenticationFilter(jwtUtil));
-        registrationBean.addUrlPatterns("/menu/*", "/owner/orders/*","/user/orders/*", "/stores/*"); // 필터가 적용될 URL 패턴 설정
+        registrationBean.addUrlPatterns("/*"); // 필터가 적용될 URL 패턴 설정
         return registrationBean;
     }
 

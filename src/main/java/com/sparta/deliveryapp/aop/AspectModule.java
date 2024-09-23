@@ -30,24 +30,20 @@ public class AspectModule {
     public Object trackOrder(ProceedingJoinPoint joinPoint) throws Throwable {
         // API 요청 시각
         LocalDateTime requestTime = LocalDateTime.now();
-
-        // 위 주석에 따라 requestOrder는 동작이 다르기 때문에 메서드 이름으로 구분
         String methodName = joinPoint.getSignature().getName();
-
-        // 메서드의 파라미터 가져오기
         Object[] args = joinPoint.getArgs();
 
         Long orderId = null;
         Long storeId = null;
 
-        if(methodName.equals("requestOrder")){
-            OrderRequestDto OrderRequestDto = (OrderRequestDto) args[0];
-            storeId = OrderRequestDto.getStoreId();
+        // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
+        if (methodName.equals("requestOrder")) {
+            OrderRequestDto orderRequestDto = (OrderRequestDto) args[1];  // args[1]로 수정
+            storeId = orderRequestDto.getStoreId();
 
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 가게 Id : {} :::", storeId);
-        }
-        else{
+        } else {
             orderId = (Long) args[0];
             log.info("::: API 요청 시각 : {} :::", requestTime);
             log.info("::: 주문 Id : {} :::", orderId);
@@ -55,28 +51,26 @@ public class AspectModule {
 
         Object result = null;
 
-        try{
+        try {
             result = joinPoint.proceed();
-        }catch(Exception e){
+        } catch (Exception e) {
             log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
             throw e;
-
-        }finally {
-            if(methodName.equals("requestOrder")){
-                OrderResponseDto orderResponse = (OrderResponseDto) result;
+        } finally {
+            if (methodName.equals("requestOrder")) {
+                OrderResponseDto orderResponse = (OrderResponseDto)result;
                 orderId = orderResponse.getOrderId();
                 log.info("::: 주문 Id : {} :::", orderId);
-            }
-            else{
+            } else {
                 OrderOwnerResponseDto orderOwnerResponseDto = (OrderOwnerResponseDto) result;
                 storeId = orderOwnerResponseDto.getStoreId();
                 log.info("::: 가게 Id : {} :::", storeId);
             }
-
         }
 
         return result;
     }
+
 
 
 }
