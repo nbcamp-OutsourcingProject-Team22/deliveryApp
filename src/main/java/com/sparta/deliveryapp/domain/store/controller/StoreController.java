@@ -39,7 +39,7 @@ public class StoreController {
             @PathVariable Long storeId,
             @RequestBody StoreRequestDto storeRequestDto
     ) {
-        Integer memberId = authMember.getId();
+        Long memberId = authMember.getId();
         ApiResponse<Void> result = storeService.updateStore(memberId,storeId, storeRequestDto);
         return ApiResponse.of(result);
     }
