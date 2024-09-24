@@ -1,8 +1,10 @@
 ## 프로젝트 개요
-율곡이이팀은 최근 배달 어플리케이션 개발에 대한 아웃소싱 프로젝트를 맡게 되었습니다.<br> 
-클라이언트는 배달 시장에 새롭게 진출하려는 스타트업으로, 내부에 개발 인력이 부족한 상황에서 전체 개발 과정을 외주로 맡기기로 결정했습니다. 
 
-## 기술스택 
+율곡이이팀은 최근 배달 어플리케이션 개발에 대한 아웃소싱 프로젝트를 맡게 되었습니다.<br>
+클라이언트는 배달 시장에 새롭게 진출하려는 스타트업으로, 내부에 개발 인력이 부족한 상황에서 전체 개발 과정을 외주로 맡기기로 결정했습니다.
+
+## 기술스택
+
 ![인텔리제이](https://img.shields.io/badge/IntelliJ_IDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)
 ![깃허브](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
 ![깃이그노어](https://img.shields.io/badge/gitignore.io-204ECF?style=for-the-badge&logo=gitignore.io&logoColor=white)
@@ -15,8 +17,10 @@ Development<p>
 Communication<p>
 ![슬랙](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
 ![노션](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
+
 ## API
- 담당자 | 진행상황 | HTTP 메소드 | API 기능   | URI                              | Authorization                   | Request Body                                                                                                   | Response 200                                                                                                                                                        | Response 400                                            | Response 403                              | Response 404                                               |
+
+| 담당자 | 진행상황 | HTTP 메소드 | API 기능   | URI                              | Authorization                   | Request Body                                                                                                   | Response 200                                                                                                                                                        | Response 400                                            | Response 403                              | Response 404                                               |
 |-----|------|----------|----------|----------------------------------|---------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|-------------------------------------------|------------------------------------------------------------|
 | 송민지 | 완료   | POST     | 회원 가입    | /members/sign-up                 |                                 | {"email": "email@email.com", "username": "mj", "password": "Asdf1234!"}                                        | {"code" : 200, "message" : "회원가입 성공"}                                                                                                                               | {"code" : "400", "message" : "중복된 이메일이거나 username입니다."} |                                           |                                                            |
 | 송민지 | 완료   | POST     | 로그 인     | /members/sign-in                 |                                 | {"email": "email@email.com", "password": "Asdf1234!"}                                                          | {"code" : 200, "data" : bearer ey~ }                                                                                                                                | {"code" : "400", "message" : "이메일이나 비밀번호를 확인해주세요"}      |                                           |                                                            |
@@ -33,14 +37,63 @@ Communication<p>
 | 김창민 | 완료   | GET      | 주문 상태 조회 | /user/orders/{orderId}           | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "주문 조회에 성공하였습니다.", "data" :[ { "status" : "" }]}                                                                                         |                                                         | {"code" : 403, "message" : "권한이 없습니다."}   | {"code" : 404, "message" : "주문을 찾을 수 없습니다."}               |                                             |
 | 김창민 | 완료   | PUT      | 주문 수락    | /owner/orders/{orderId}/accept   | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "주문 수락에 성공하였습니다."}                                                                                                                       | {"code" : 400, "message" : "만료된 주문입니다."}                | {"code" : 403, "message" : "권한이 없습니다."}   | {"code" : 404, "message" : "주문을 찾을 수 없습니다."}               |
 | 김창민 | 완료   | PUT      | 주문 거절    | /owner/orders/{orderId}/reject   | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "주문 거절에 성공하였습니다."}                                                                                                                       | {"code" : 400, "message" : "만료된 주문입니다."}                | {"code" : 403, "message" : "권한이 없습니다."}   | {"code" : 404, "message" : "주문을 찾을 수 없습니다."}               |
-| 김창민 | 완료   | PUT      | 주문 거절    | /owner/orders/{orderId}/next     | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "주문 진행에 성공하였습니다.", "data" :[ { "status" : "" }]}                                                                                         | {"code" : 400, "message" : "만료된 주문입니다."}                | {"code" : 403, "message" : "권한이 없습니다."}   | {"code" : 404, "message" : "주문을 찾을 수 없습니다."}               |
+| 김창민 | 완료   | PUT      | 주문 진행    | /owner/orders/{orderId}/next     | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "주문 진행에 성공하였습니다.", "data" :[ { "status" : "" }]}                                                                                         | {"code" : 400, "message" : "만료된 주문입니다."}                | {"code" : 403, "message" : "권한이 없습니다."}   | {"code" : 404, "message" : "주문을 찾을 수 없습니다."}               |
 | 고 결 | 완료   | POST     | 리뷰 생성    | /reviews                         | "Authorization" : "Bearer xxxx" | {"orderId" : , "rating" : , "contents" : }                                                                     | {"code" : 200, "message" : "리뷰 작성이 성공하였습니다.", "data" : [{ "storeName" : "", "rating" : "", "contents" : "" }]}                                                      | {"code" : 400, "message" : "배달이 완료되지 않았습니다."}           |                                           |                                                            |
-| 고 결 | 완료   | GET      | 리뷰 조회    | /reviews/stores/{storeId}        | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "리뷰 조회 성공", "data" : [ { "reviewId" : , "orderId" : , "rating" : , "contents" : "" } ]}                                                                                        
+| 고 결 | 완료   | GET      | 리뷰 조회    | /reviews/stores/{storeId}        | "Authorization" : "Bearer xxxx" |                                                                                                                | {"code" : 200, "message" : "리뷰 조회 성공", "data" : [ { "reviewId" : , "orderId" : , "rating" : , "contents" : "" } ]}                                                  |                                                         |                                           |                                                            |
+
 ## ERD
+
 ![image](https://github.com/user-attachments/assets/e4f631eb-fb24-4c6a-aa76-1ab45f7a6067)
 
+## 주요 기능
+
+### 회원
+
+| 기능    | 내용                                                            |
+|-------|---------------------------------------------------------------|
+| 회원 가입 | Owner, User 권한에 맞는 URI를 이용해서 이메일, 유저명, 비밀번호를 입력받아 회원정보를 저장한다. |
+| 로그 인  | 저장된 이메일과 비밀번호를 입력해 JWT를 반환받는다.                                |
+| 회원 탈퇴 | 회원 정보의 상태를 탈퇴 상태로 변환한다. 탈퇴 상태의 정보는 다시 사용할 수 없다.               |
+
+### 가게
+
+| 기능        | 내용                                     |
+|-----------|----------------------------------------|
+| 가게 생성     | Owenr 권한의 회원이 최대 3개의 가게를 생성할 수 있다.     |
+| 가게 수정     | 가게 명, 영업 시작, 마감 시간, 최소 주문 가능 금액을 수정한다. |
+| 가게 폐업     | 가게를 삭제합니다.                             |
+| 가게 조회(다건) | 생성된 가게 전부를 조회합니다.                      |
+| 가게 조회(단건) | 생성된 가게중 단건을 조회합니다.                     |
+
+### 메뉴
+
+| 기능    | 내용                                  |
+|-------|-------------------------------------|
+| 메뉴 생성 | Owner 권한을 갖은 회원의 소유인 가게에 메뉴를 추가합니다. |
+| 메뉴 수정 | 저장된 메뉴의 이름, 가격, 설명을 수정합니다.          |
+| 메뉴 삭제 | 저장된 메뉴를 삭제합니다.                      |
+
+### 주문
+
+| 기능       | 내용                                         |
+|----------|--------------------------------------------|
+| 주문 요청    | User 권한의 회원이 가게 id, 메뉴 id를 입력해서 주문을 생성합니다. |
+| 주문 상태 조회 | User 권한의 회원 소유의 주문 상태를 조회합니다.              |
+| 주문 수락    | Owner 권한의 회원 소유의 가게에 저장된 주문을 수락합니다.        |
+| 주문 거절    | Owner 권한의 회원 소유의 가게에 저장된 주문을 거절합니다.        |
+| 주문 진행    | Owner 권한의 회원 소유의 가게에 저장된 주문 상태를 진행합니다.     |
+
+### 리뷰
+
+| 기능    | 내용                            |
+|-------|-------------------------------|
+| 리뷰 생성 | 주문 id를 소유한 회원이 별점과 내용을 작성합니다. |
+| 리뷰 조회 | 특정 가게에 저장된 리뷰를 조회합니다.         |
+
 ## 트러블슈팅
+
 ### filter 적용
+
 ```
 package com.sparta.deliveryapp.filter;
 
@@ -59,18 +112,23 @@ public class FilterConfig {
         return registrationBean;
     }
 ```
+
 ### 문제내용
+
 filter가 제대로 적용되지 않아 jwt token을 decode하는데 필요한 Signing key not null에러와 key값이 null로 출력되는 문제가 발생하였다.
 
 ### 해결과정
-**문제1** : token을 생성, 분해 및 검증을 하는 JwtUtill은 Filter를 주입받는 JwtAuthenticationFilter에 이미 주입되어 있었다. 
+
+**문제1** : token을 생성, 분해 및 검증을 하는 JwtUtill은 Filter를 주입받는 JwtAuthenticationFilter에 이미 주입되어 있었다.
 따라서 새로운 JwtUill객체를 사용하지 않는다.<p>
-**문제2** : 제네릭으로  FilterRegistrationBean이 등록하려는 필터 타입이 JwtAuthenticationFilter라는 것을 알려주고 있으나, JwtAuthenticationFilter가 어디서 오는지 명시되지 않았다.
+**문제2** : 제네릭으로 FilterRegistrationBean이 등록하려는 필터 타입이 JwtAuthenticationFilter라는 것을 알려주고 있으나, JwtAuthenticationFilter가 어디서
+오는지 명시되지 않았다.
 따라서 spring이 JwtAuthenticationFilter객제를 제공하고 생성할 수 없었다. <p>
 **문제3** : 1번 문제와 마찬가지로 새로운 객체를 생성할 필요가 없었다.<p>
 **문제4** : 필터가 적용될 URL은 전체로 하되 JwtAuthenticationFilter에서 예외 URL을 설정할 수 있다.
 
-### 수정된 코드 
+### 수정된 코드
+
 ```
 package com.sparta.deliveryapp.filter;
 
@@ -94,12 +152,14 @@ public class FilterConfig {
 }
 ```
 
-
 ## 프로젝트 팀원
+
 | 이 름 | MBTI | 직책 |                  깃허브 주소                   |
 |-----|:----:|:--:|:-----------------------------------------:|
-| 배주희 | ISFJ | 팀장 | [배주희](https://github.com/vege4944) |
-| 김경민 | ISFP | 팀원 | [김경민](https://github.com/kkm4512) |
+| 배주희 | ISFJ | 팀장 |    [배주희](https://github.com/vege4944)     |
+| 김경민 | ISFP | 팀원 |     [김경민](https://github.com/kkm4512)     |
 | 김창민 | INFJ | 팀원 | [김창민](https://github.com/Rlackdals981010) |
-| 고 결 | INTP | 팀원 | [고결](https://github.com/gyeol9012) |
-| 송민지 | ISTJ | 팀원 | [송민지](https://github.com/mj-song00?) |
+| 고 결 | INTP | 팀원 |    [고결](https://github.com/gyeol9012)     |
+| 송민지 | ISTJ | 팀원 |   [송민지](https://github.com/mj-song00?)    |
+
+
