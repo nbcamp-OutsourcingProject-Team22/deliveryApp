@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("stores/{storeId}/menus")
 public class MenuController {
     private final MenuService menuService;
-
     // 메뉴 생성 (controller 에서는 보내주기만 하기
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createMenu (
