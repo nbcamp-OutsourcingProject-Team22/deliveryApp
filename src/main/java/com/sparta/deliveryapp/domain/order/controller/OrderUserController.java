@@ -8,7 +8,6 @@ import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
-import com.sparta.deliveryapp.domain.order.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ public class OrderUserController {
 
     @TrackOrder
     @PostMapping("/request")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> requestOrder(@Auth AuthMember member, @RequestBody OrderRequestDto orderRequestDto){
+    public ResponseEntity<ApiResponse<OrderResponseDto>> requestOrder(@Auth AuthMember member, @RequestBody @Valid OrderRequestDto orderRequestDto){
 
         ApiResponse<OrderResponseDto> response = orderService.requestOrder(member, orderRequestDto);
         return ApiResponse.of(response);
