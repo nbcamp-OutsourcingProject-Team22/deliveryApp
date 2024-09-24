@@ -67,11 +67,13 @@ public class OrderCheckTest {
         ReflectionTestUtils.setField(menu, "id", 1L);
         order = new Order(member, store, menu, OrderStatusEnum.REQUEST);
         ReflectionTestUtils.setField(order, "id", 1L);
+
+
     }
 
     @Test
     void 조회_성공() {
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
         given(order.getMember().getId()).willReturn(1L);
@@ -86,8 +88,7 @@ public class OrderCheckTest {
     @Test
     void Order_유저아님(){
 
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(authMember.getRole()).willReturn(UserRole.OWNER);
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
@@ -99,7 +100,7 @@ public class OrderCheckTest {
 
     @Test
     void 주문_없음() {
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -117,7 +118,7 @@ public class OrderCheckTest {
                 .willReturn(Optional.of(member));
 
         // member의 userRole을 지정
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(member.getId()).willReturn(1L); // authMember와 같은 ID 설정
 
         // 다른 유저로 설정
