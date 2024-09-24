@@ -1,15 +1,10 @@
 package com.sparta.deliveryapp.aop;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
-import com.sparta.deliveryapp.domain.member.dto.AuthMember;
 import com.sparta.deliveryapp.domain.order.dto.OrderOwnerResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderRequestDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
-import com.sparta.deliveryapp.exception.HandleNotFound;
-import com.sparta.deliveryapp.exception.HandleUnauthorizedException;
-import com.sparta.deliveryapp.exception.InvalidRequestException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -62,7 +57,6 @@ public class AspectModule {
                 storeId = orderUserResponseDto.getData().getStoreId();
                 statusProcess = orderUserResponseDto.getData().getProcess();
             }
-
             else {
                 ResponseEntity<ApiResponse<OrderOwnerResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderOwnerResponseDto>>) result;
                 ApiResponse<OrderOwnerResponseDto> orderOwnerResponseDto = responseEntity.getBody();
@@ -71,7 +65,6 @@ public class AspectModule {
                 statusProcess = orderOwnerResponseDto.getData().getProcess();
 
             }
-
             log.info("::: 주문 Id : {} :::", orderId);
             log.info("::: 가게 Id : {} :::",storeId);
             log.info("::: API 요청 시각 : {} :::", requestTime);
