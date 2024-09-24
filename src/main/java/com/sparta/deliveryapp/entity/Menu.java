@@ -1,6 +1,7 @@
 package com.sparta.deliveryapp.entity;
 
 import com.sparta.deliveryapp.domain.menu.dto.MenuRequest;
+import com.sparta.deliveryapp.domain.menu.validation.MenuValidate;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,5 +51,9 @@ public class Menu {
 
     public void markAsDeleted() {
         this.isDeleted = true; // 메뉴를 삭제 상태로 변경
+    }
+
+    public Menu validateMenu (Long storeId){
+        return MenuValidate.validateMenu(storeId, this);
     }
 }
