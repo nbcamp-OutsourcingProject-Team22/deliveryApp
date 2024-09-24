@@ -33,11 +33,7 @@ public class MemberService {
         Optional<Member> userByEmail = memberRepository.findByEmail(request.getEmail());
         Optional<Member> userByNickname = memberRepository.findByUsername(request.getUsername());
 
-        if (userByEmail.isPresent()) {
-            throw new InvalidRequestException(ApiResponseMemberEnum.USERNAME_EMAIL_CHECK);
-        }
-
-        if (userByNickname.isPresent()) {
+        if (userByEmail.isPresent() || (userByNickname.isPresent())) {
             throw new InvalidRequestException(ApiResponseMemberEnum.USERNAME_EMAIL_CHECK);
         }
 
@@ -103,7 +99,7 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호를 확인해주세요");
         }
         String token = jwtUtil.createToken(member.getId(), member.getUsername(), member.getUserRole(), member.isActive(), member.isSecession());
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, "Bearer "+token);
         return token;
     }
 
