@@ -129,7 +129,6 @@ public class OrderAcceptTest {
     @Test
     void 수락_주인_권한_아님(){
 
-
         given(authMember.getRole()).willReturn(UserRole.USER);
 
         // when & then
