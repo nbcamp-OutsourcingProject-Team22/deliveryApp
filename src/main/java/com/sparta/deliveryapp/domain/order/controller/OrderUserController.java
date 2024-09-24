@@ -9,6 +9,7 @@ import com.sparta.deliveryapp.domain.order.dto.OrderResponseDto;
 import com.sparta.deliveryapp.domain.order.dto.OrderUserResponseDto;
 import com.sparta.deliveryapp.domain.order.service.OrderService;
 import com.sparta.deliveryapp.domain.order.service.OrderServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
