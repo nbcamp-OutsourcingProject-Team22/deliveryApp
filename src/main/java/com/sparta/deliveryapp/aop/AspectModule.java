@@ -43,6 +43,7 @@ public class AspectModule {
 
         Long orderId = null;
         Long storeId = null;
+        String statusProcess = null;
 
         try {
             Object result = joinPoint.proceed();
@@ -59,7 +60,7 @@ public class AspectModule {
                 ApiResponse<OrderUserResponseDto> orderUserResponseDto = responseEntity.getBody();
                 orderId = (Long) args[1];
                 storeId = orderUserResponseDto.getData().getStoreId();
-                log.info("::: 주문 상태 : {} :::",orderUserResponseDto.getData().getProcess());
+                statusProcess = orderUserResponseDto.getData().getProcess();
             }
 
             else {
@@ -67,12 +68,18 @@ public class AspectModule {
                 ApiResponse<OrderOwnerResponseDto> orderOwnerResponseDto = responseEntity.getBody();
                 orderId = (Long) args[1];
                 storeId = orderOwnerResponseDto.getData().getStoreId();
-                log.info("::: 주문 상태 : {} :::",orderOwnerResponseDto.getData().getProcess());
+                statusProcess = orderOwnerResponseDto.getData().getProcess();
+
             }
 
             log.info("::: 주문 Id : {} :::", orderId);
             log.info("::: 가게 Id : {} :::",storeId);
             log.info("::: API 요청 시각 : {} :::", requestTime);
+
+            if(statusProcess!=null){
+                log.info("::: 주문 상태 : {} :::",statusProcess);
+            }
+
             return result;
 
         }catch(Exception e){
