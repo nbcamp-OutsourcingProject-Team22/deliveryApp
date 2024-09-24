@@ -107,7 +107,7 @@ public class OrderAcceptTest {
         });
 
         // then
-        assertEquals("진행중인 주문입니다.",exception.getApiResponseEnum().getMessage());
+        assertEquals("진행된 주문입니다.",exception.getApiResponseEnum().getMessage());
     }
     @Test
     void 거절_이미_진행된_주문() {
@@ -124,7 +124,7 @@ public class OrderAcceptTest {
         });
 
         // then
-        assertEquals("진행중인 주문입니다.",exception.getApiResponseEnum().getMessage());
+        assertEquals("진행된 주문입니다.",exception.getApiResponseEnum().getMessage());
     }
     @Test
     void 수락_주인_권한_아님(){
