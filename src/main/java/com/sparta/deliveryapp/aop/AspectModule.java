@@ -37,56 +37,51 @@ public class AspectModule {
     public Object trackOrder(ProceedingJoinPoint joinPoint) throws Throwable {
         // API 요청 시각
         LocalDateTime requestTime = LocalDateTime.now();
+
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
         Long orderId = null;
         Long storeId = null;
 
-        if (methodName.equals("requestOrder")) {
-            OrderRequestDto orderRequestDto = (OrderRequestDto) args[1]; // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
-            storeId = orderRequestDto.getStoreId();
-
-            log.info("::: API 요청 시각 : {} :::", requestTime);
-            log.info("::: 가게 Id : {} :::", storeId);
-        } else {
-            orderId = (Long) args[1];
-            log.info("::: API 요청 시각 : {} :::", requestTime);
-            log.info("::: 주문 Id : {} :::", orderId);
-        }
-
-        Object result = null;
-
         try {
-            result = joinPoint.proceed();
-//        } catch (Exception e) {
-//            log.info("::: 예상 못한 오류 발생 : {} :::", e.getMessage());
-//            throw e;
-        }catch(HandleNotFound | InvalidRequestException | HandleUnauthorizedException e){
-            log.info("{}", e.getMessage());
-            throw e;
-        }
-        finally {
+            Object result = joinPoint.proceed();
+
             if (methodName.equals("requestOrder")) {
                 ResponseEntity<ApiResponse<OrderResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderResponseDto>>) result;
                 ApiResponse<OrderResponseDto> orderResponseDto = responseEntity.getBody();
-                log.info("::: 주문 Id : {} :::", orderResponseDto.getData().getOrderId());
-            } else if(methodName.equals("checkOrder")) {
+                OrderRequestDto orderRequestDto = (OrderRequestDto) args[1]; // 첫 번째 인자는 AuthMember, 두 번째 인자는 OrderRequestDto
+                storeId = orderRequestDto.getStoreId();
+                orderId = orderResponseDto.getData().getOrderId();
 
+            } else if(methodName.equals("checkOrder")) {
                 ResponseEntity<ApiResponse<OrderUserResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderUserResponseDto>>) result;
                 ApiResponse<OrderUserResponseDto> orderUserResponseDto = responseEntity.getBody();
-                log.info("::: 가게 Id : {} :::",orderUserResponseDto.getData().getStoreId() );
+                orderId = (Long) args[1];
+                storeId = orderUserResponseDto.getData().getStoreId();
                 log.info("::: 주문 상태 : {} :::",orderUserResponseDto.getData().getProcess());
             }
+
             else {
                 ResponseEntity<ApiResponse<OrderOwnerResponseDto>> responseEntity = (ResponseEntity<ApiResponse<OrderOwnerResponseDto>>) result;
                 ApiResponse<OrderOwnerResponseDto> orderOwnerResponseDto = responseEntity.getBody();
-                log.info("::: 가게 Id : {} :::",orderOwnerResponseDto.getData().getStoreId());
+                orderId = (Long) args[1];
+                storeId = orderOwnerResponseDto.getData().getStoreId();
                 log.info("::: 주문 상태 : {} :::",orderOwnerResponseDto.getData().getProcess());
             }
+
+            log.info("::: 주문 Id : {} :::", orderId);
+            log.info("::: 가게 Id : {} :::",storeId);
+            log.info("::: API 요청 시각 : {} :::", requestTime);
+            return result;
+
+        }catch(Exception e){
+            log.info("{}", e.getMessage());
+            throw e;
         }
 
-        return result;
+
+
     }
 
 
