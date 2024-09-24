@@ -69,14 +69,15 @@ public class OrderServiceImplTest {
         ReflectionTestUtils.setField(menu, "id", 1L);
         order = new Order(member, store, menu, OrderStatusEnum.REQUEST);
         ReflectionTestUtils.setField(order, "id", 1L);
+
+
     }
 
     @Test
     void Order_주문저장() {
         // given
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
-
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(menuRepository.findById(anyLong())).willReturn(Optional.of(menu));
@@ -93,9 +94,7 @@ public class OrderServiceImplTest {
     @Test
     void Order_유저아님(){
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
-
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(authMember.getRole()).willReturn(UserRole.OWNER);
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
@@ -110,8 +109,7 @@ public class OrderServiceImplTest {
     void Order_가게없음(){
         // given
         OrderRequestDto orderRequestDto = new OrderRequestDto(1L, 1L);
-
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(storeRepository.findById(1L)).willReturn(Optional.empty());
 
@@ -130,8 +128,7 @@ public class OrderServiceImplTest {
 
         Store store = mock(Store.class);
         ReflectionTestUtils.setField(store, "id", 1L);
-
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(storeRepository.findById(1L)).willReturn(Optional.of(store));
         given(menuRepository.findById(1L)).willReturn(Optional.empty());

@@ -66,6 +66,7 @@ public class OrderProceedTest {
         menu = mock(Menu.class);
         ReflectionTestUtils.setField(menu, "id", 1L);
 
+
     }
 
     @Test
@@ -73,10 +74,9 @@ public class OrderProceedTest {
         Order order = new Order(member, store, menu, OrderStatusEnum.PREPARING);
         ReflectionTestUtils.setField(order, "id", 1L);
 
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(authMember.getRole()).willReturn(UserRole.OWNER);
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
-        given(store.getMember()).willReturn(member);
 
         ApiResponse<OrderOwnerResponseDto> ret = orderServiceImpl.proceedOrder(authMember, order.getId());
 
@@ -89,10 +89,9 @@ public class OrderProceedTest {
         Order order = new Order(member, store, menu, OrderStatusEnum.DELIVERED);
         ReflectionTestUtils.setField(order, "id", 1L);
 
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(authMember.getRole()).willReturn(UserRole.OWNER);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-        given(store.getMember()).willReturn(member);
 
 
 
@@ -100,7 +99,7 @@ public class OrderProceedTest {
             orderServiceImpl.proceedOrder(authMember, order.getId());
         });
 
-        assertEquals("완료된 주문입니다.",exception.getApiResponseEnum().getMessage());
+        assertEquals("만료된 주문입니다.",exception.getApiResponseEnum().getMessage());
 
     }
     @Test
@@ -108,24 +107,23 @@ public class OrderProceedTest {
         Order order = new Order(member, store, menu, OrderStatusEnum.REJECTED);
         ReflectionTestUtils.setField(order, "id", 1L);
 
-        given(member.getUserRole()).willReturn(UserRole.OWNER);
+        given(authMember.getRole()).willReturn(UserRole.OWNER);
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-        given(store.getMember()).willReturn(member);
+
 
         InvalidRequestException exception = assertThrows(InvalidRequestException.class,()->{
             orderServiceImpl.proceedOrder(authMember, order.getId());
         });
 
-        assertEquals("거부된 주문입니다.",exception.getApiResponseEnum().getMessage());
+        assertEquals("만료된 주문입니다.",exception.getApiResponseEnum().getMessage());
     }
     @Test
     void Order_주인_아님(){
         Order order = new Order(member, store, menu, OrderStatusEnum.REJECTED);
         ReflectionTestUtils.setField(order, "id", 1L);
 
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-        given(member.getUserRole()).willReturn(UserRole.USER);
+        given(authMember.getRole()).willReturn(UserRole.USER);
 
         // when & then
         HandleUnauthorizedException exception = assertThrows(HandleUnauthorizedException.class, () -> {
