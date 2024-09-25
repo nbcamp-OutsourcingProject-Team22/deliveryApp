@@ -2,6 +2,8 @@ package com.sparta.deliveryapp.domain.member;
 
 import com.sparta.deliveryapp.apiResponseEnum.ApiResponse;
 import com.sparta.deliveryapp.config.PasswordEncoder;
+import com.sparta.deliveryapp.domain.member.dto.AuthMember;
+import com.sparta.deliveryapp.domain.member.dto.request.SecessionRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
@@ -48,6 +50,7 @@ public class MemberServiceTest {
 
     @Mock
     SignupRequestDto signupRequestDto;
+    SecessionRequestDto secessionRequestDto;
     Member ownerMember;
 
     @Spy
@@ -56,6 +59,8 @@ public class MemberServiceTest {
     String testMemberUsername1 = "test";
     String testMemberEmail1 = "test@naver.com";
     String testMemberPassword1 = "!@Skdud340";
+
+    Long testMemberId1 = 1L;
 
     @BeforeEach
     public void setup() {
@@ -71,6 +76,7 @@ public class MemberServiceTest {
 
         existingMember = TestInfo.getOwnerOneMember();
         signInRequestDto = new SignInRequestDto("test1@naver.com", "!@Skdud340");
+        secessionRequestDto = new SecessionRequestDto("!@Skdud340");
 
         //문제 3
         memberService = new MemberService(memberRepository,passwordEncoder,jwtUtil);
@@ -258,6 +264,7 @@ public class MemberServiceTest {
                     UserRole.OWNER
             );
 
+
             given(memberRepository.findByEmail(signInRequestDto.getEmail())).willReturn(Optional.of(existingMember));
 
             //when
@@ -267,6 +274,115 @@ public class MemberServiceTest {
 
             //then
             assertEquals("비밀번호를 확인해주세요",exception.getMessage());
+        }
+    }
+
+    @Nested
+    class Secession{
+        @Test
+        @DisplayName("회원탈퇴 - 성공")
+        void success_secession(){
+            //given - email, password
+            SignupRequestDto signupRequestDto = TestInfo.getOneSignUpRequestDto();
+            String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
+
+
+            existingMember = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    encodedPassword, // 인코딩된 비밀번호 사용
+                    UserRole.OWNER
+            );
+
+            existingMember.setId(testMemberId1);
+
+            given(memberRepository.findById(testMemberId1)).willReturn(Optional.of(existingMember));
+
+            //authMember
+            AuthMember authMember = new AuthMember(
+                    existingMember.getId(),
+                    existingMember.getUsername(),
+                    existingMember.getUserRole(),
+                    existingMember.isActive(),
+                    existingMember.isSecession()
+            );
+
+            //when
+            ApiResponse<Void> result = memberService.secession(authMember, secessionRequestDto);
+
+            assertEquals("요청 완료", result.getMessage());
+        }
+
+        @Test
+        @DisplayName("회원탈퇴 - 실패")
+        void fail_secession(){
+            //given - email, password
+            SignupRequestDto signupRequestDto = TestInfo.getOneSignUpRequestDto();
+            String encodedPassword = passwordEncoder.encode("Asdf1234!");
+
+
+            existingMember = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    encodedPassword, // 인코딩된 비밀번호 사용
+                    UserRole.OWNER
+            );
+
+            existingMember.setId(testMemberId1);
+
+            given(memberRepository.findById(testMemberId1)).willReturn(Optional.of(existingMember));
+
+            //authMember
+            AuthMember authMember = new AuthMember(
+                    existingMember.getId(),
+                    existingMember.getUsername(),
+                    existingMember.getUserRole(),
+                    existingMember.isActive(),
+                    existingMember.isSecession()
+            );
+            existingMember.setId(testMemberId1);
+
+            //when
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                memberService.secession(authMember, secessionRequestDto);
+            });
+
+            assertEquals("비밀번호를 확인해주세요", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("회원탈퇴 - 실패:찾을수 없는 id")
+        void fail_secession_without_id(){
+            //given - email, password
+            SignupRequestDto signupRequestDto = TestInfo.getOneSignUpRequestDto();
+            String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
+
+
+            existingMember = new Member(
+                    signupRequestDto.getEmail(),
+                    signupRequestDto.getUsername(),
+                    encodedPassword, // 인코딩된 비밀번호 사용
+                    UserRole.OWNER
+            );
+            existingMember.setId(testMemberId1);
+
+            given(memberRepository.findById(testMemberId1)).willReturn(Optional.empty());
+
+            //authMember
+            AuthMember authMember = new AuthMember(
+                    existingMember.getId(),
+                    existingMember.getUsername(),
+                    existingMember.getUserRole(),
+                    existingMember.isActive(),
+                    existingMember.isSecession()
+            );
+
+            //when
+            NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+                memberService.secession(authMember, secessionRequestDto);
+            });
+
+            assertEquals("잘못된 정보입니다.", exception.getMessage());
         }
     }
 }
