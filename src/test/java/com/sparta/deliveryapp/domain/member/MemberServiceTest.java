@@ -7,7 +7,7 @@ import com.sparta.deliveryapp.domain.member.dto.request.SecessionRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignInRequestDto;
 import com.sparta.deliveryapp.domain.member.dto.request.SignupRequestDto;
 import com.sparta.deliveryapp.domain.member.repository.MemberRepository;
-import com.sparta.deliveryapp.domain.member.service.MemberService;
+import com.sparta.deliveryapp.domain.member.service.MemberServiceImpl;
 import com.sparta.deliveryapp.entity.Member;
 import com.sparta.deliveryapp.exception.InvalidRequestException;
 import com.sparta.deliveryapp.init.TestInfo;
@@ -43,7 +43,7 @@ public class MemberServiceTest {
     private JwtUtil jwtUtil; //문제 1
 
     @InjectMocks
-    private MemberService memberService;
+    private MemberServiceImpl memberService;
 
     private SignInRequestDto signInRequestDto;
     private Member existingMember;
@@ -79,7 +79,7 @@ public class MemberServiceTest {
         secessionRequestDto = new SecessionRequestDto("!@Skdud340");
 
         //문제 3
-        memberService = new MemberService(memberRepository,passwordEncoder,jwtUtil);
+        memberService = new MemberServiceImpl(memberRepository,passwordEncoder,jwtUtil);
     }
 
 
