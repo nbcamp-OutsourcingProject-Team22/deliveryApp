@@ -111,8 +111,8 @@ public class MemberService {
 
 
         //비밀번호 확인
-        if (!PasswordUtils.isValidPassword(requestDto.getPassword())) {
-            throw new InvalidRequestException(ApiResponseMemberEnum.PASSWORD_CHECK);
+        if (!passwordEncoder.matches(requestDto.getPassword(),member.getPassword() )){
+            throw new IllegalArgumentException("비밀번호를 확인해주세요");
         }
 
         member.changeSecession();
